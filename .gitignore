@@ -1,0 +1,46 @@
+# Create a .gitignore file with common ASP.NET Core exclusions
+cat > .gitignore << 'EOF'
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# NuGet Packages
+*.nupkg
+**/packages/*
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE
+.vscode/
+.idea/
+
+# Others
+*.log
+*.cache
+appsettings.Development.json
+EOF
+
+# Remove cached .vs files from git's staging area
+git rm -r --cached .vs/
+
+# Now add your files
+git add .
+
+# Commit your changes
+git commit -m "Initial commit"
