@@ -10,4 +10,8 @@
     <PackageReference Include="Google.Cloud.Firestore" Version="4.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Common_Class\Common_Class.csproj" />
+  </ItemGroup>
+
 </Project>
