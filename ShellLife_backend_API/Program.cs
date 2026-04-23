@@ -1,4 +1,8 @@
 
+using Business_Layer.Services;
+using Common_Class.Interfaces;
+using Data_Layer.Extensions;
+using Data_Layer.Services;
 namespace ShellLife_backend_API
 {
     public class Program
@@ -10,6 +14,10 @@ namespace ShellLife_backend_API
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            builder.Services.AddFirestoreDatabase(builder.Configuration);
+            builder.Services.AddScoped<IInventoryDataService, InventoryDataService>();
+            builder.Services.AddScoped<inventoryLogicService>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
