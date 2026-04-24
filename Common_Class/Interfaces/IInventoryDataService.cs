@@ -7,6 +7,10 @@ namespace Common_Class.Interfaces
 {
     public interface IInventoryDataService
     {
-        Task<List<InventoryEntity>> GetUserInventoryAsync(string userId);
+        Task<List<Food>> GetUserInventoryAsync(string userId);
+
+        Task<bool> AddInventoryItemAsync(Food item, string userId);
+
+
     }
 }

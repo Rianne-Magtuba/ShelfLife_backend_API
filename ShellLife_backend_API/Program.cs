@@ -18,6 +18,10 @@ namespace ShellLife_backend_API
             builder.Services.AddFirestoreDatabase(builder.Configuration);
             builder.Services.AddScoped<IInventoryDataService, InventoryDataService>();
             builder.Services.AddScoped<inventoryLogicService>();
+            builder.Services.AddScoped<IProductDataService, ProductDataService>();
+            builder.Services.AddScoped<ProductLogicService>();
+
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

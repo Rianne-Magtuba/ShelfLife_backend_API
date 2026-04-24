@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Business_Layer.DTOs
+namespace Business_Layer.DTOs.InventoryDTO
 {
     public class AddInventoryItemRequestDto
     {
