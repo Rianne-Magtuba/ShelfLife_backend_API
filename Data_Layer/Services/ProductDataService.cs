@@ -1,0 +1,58 @@
+﻿using Common_Class.Entities;
+using Common_Class.Interfaces;
+using Google.Cloud.Firestore;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Data_Layer.Services
+{
+    public class ProductDataService : IProductDataService
+    {
+        private readonly FirestoreDb _firestoreDb;
+        public ProductDataService(FirestoreDb firestoreDb)
+        {
+            _firestoreDb = firestoreDb;
+        }
+
+
+        public async Task<Product> GetProductAsync(string barcode)
+        {
+            var collectionRef = _firestoreDb.Collection("Product Catalog").Document(barcode);
+            var snapshot = await collectionRef.GetSnapshotAsync();
+           
+
+          Product product = snapshot.ConvertTo<Product>();
+
+            return product;
+      
+        }
+
+
+        public async Task<bool> RegisterProductAsync(Product product)
+        {
+            try
+            {
+                CollectionReference collectionRef = _firestoreDb.Collection("Product Catalog");
+
+                DocumentReference documentRef = collectionRef.Document(product.Barcode);
+
+                await documentRef.SetAsync(product);
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error registering product: {ex.Message}");
+                return false;
+            }
+        }
+       
+
+
+        public Task RemoveProductAsync(string barcode)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

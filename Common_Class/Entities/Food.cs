@@ -6,7 +6,7 @@ using System.Text;
 namespace Common_Class.Entities
 {
     [FirestoreData]
-    public class InventoryEntity
+    public class Food
     {
         [FirestoreDocumentId]
         public string InventoryId { get; set; } = string.Empty;

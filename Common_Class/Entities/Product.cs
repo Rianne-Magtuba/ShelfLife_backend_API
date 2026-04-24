@@ -2,7 +2,8 @@
 
 namespace Common_Class.Entities
 {
-    public class ProductEntity
+    [FirestoreData]
+    public class Product
     {
 
         [FirestoreDocumentId]
@@ -11,9 +12,7 @@ namespace Common_Class.Entities
         [FirestoreProperty("name")]
         public string Name { get; set; } = string.Empty;
 
-        [FirestoreProperty("description")]
-        public string Description { get; set; } = string.Empty;
-
+       
         [FirestoreProperty("category")]
         public string Category { get; set; } = string.Empty;
 

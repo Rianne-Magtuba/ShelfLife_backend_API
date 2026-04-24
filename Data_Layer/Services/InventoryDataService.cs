@@ -13,21 +13,18 @@ namespace Data_Layer.Services
             _firestoreDb = firestoreDb;
         }
 
-        private void initializeFirebaseApp()
-        {
-        }
 
-        public async Task<List<InventoryEntity>> GetUserInventoryAsync(string userId)
+        public async Task<List<Food>> GetUserInventoryAsync(string userId)
         {
             var collectionRef = _firestoreDb.Collection("Users").Document(userId).Collection("inventory");
             var snapshot = await collectionRef.GetSnapshotAsync();
-            var inventoryList = new List<InventoryEntity>();
+            var inventoryList = new List<Food>();
 
             foreach(var document in snapshot.Documents)
             {
                 if(document.Exists)
                 {
-                    var inventoryItem = document.ConvertTo<InventoryEntity>();
+                    var inventoryItem = document.ConvertTo<Food>();
                     inventoryList.Add(inventoryItem);
                 }
             }
@@ -35,10 +32,24 @@ namespace Data_Layer.Services
             return inventoryList;
 
         }
-        private void addProduct(ProductEntity product)
+    
+        public async Task<bool> AddInventoryItemAsync(Food item, string userId)
         {
+            try
+            {
+                CollectionReference collectionRef = _firestoreDb.Collection("Users").Document(userId).Collection("inventory");
+                await collectionRef.AddAsync(item);
 
+          
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding item: {ex.Message}");
+                return false;
+            }
         }
-       
-    }
+
+    
+        }
 }
