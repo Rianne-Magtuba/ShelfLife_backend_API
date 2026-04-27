@@ -28,7 +28,24 @@ namespace Data_Layer.Services
       
         }
 
+        public async Task<List<Product>> getProductsAsync()
+        {
+            var collectionRef = _firestoreDb.Collection("Product Catalog");
+            var snapshot = await collectionRef.GetSnapshotAsync();
+            List <Product> productList = new List<Product>();
 
+            foreach(var document in snapshot.Documents)
+            {
+                if(document.Exists)
+                {
+                    var product = document.ConvertTo<Product>();
+                    productList.Add(product);
+                }
+            }
+
+            return productList;
+        }
+        
         public async Task<bool> RegisterProductAsync(Product product)
         {
             try

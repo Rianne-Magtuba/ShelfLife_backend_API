@@ -27,8 +27,8 @@ namespace Business_Layer.Services
             {
                 Barcode = requestDto.Barcode,
                 Name = requestDto.Name,
-             
-                Category = requestDto.Category,          
+
+                Category = requestDto.Category,
                 WeightGrams = requestDto.WeightGrams,
 
                 // THE SERVER GENERATES THE TIMESTAMP HERE
@@ -55,6 +55,24 @@ namespace Business_Layer.Services
         }
 
 
-    }
+        public async Task<List<ProductRequestDTO>> GetProductsAsync()
+        {
+            var productEntities = await _dataService.getProductsAsync();
+            var productDTOs = new List<ProductRequestDTO>();
+            foreach (var product in productEntities)
+            {
+                var dto = new ProductRequestDTO
+                {
+                    Barcode = product.Barcode,
+                    Name = product.Name,
+                    Category = product.Category,
+                   
+                    WeightGrams = product.WeightGrams
+                };
+                productDTOs.Add(dto);
+            }
+            return productDTOs;
+        }
 
+    }
 }
