@@ -11,6 +11,6 @@ namespace Common_Class.Interfaces
 
         Task<bool> AddInventoryItemAsync(Food item, string userId);
 
-
+        Task<bool> DiscardFoodItemAsync(string inventoryId, string userId);
     }
 }

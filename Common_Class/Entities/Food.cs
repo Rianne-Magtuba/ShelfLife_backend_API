@@ -37,8 +37,17 @@ namespace Common_Class.Entities
         [FirestoreProperty("dateRegistered")]
         public Timestamp DateRegistered { get; set; }
 
-        [FirestoreProperty("status")]
-        public string Status { get; set; } = "active";
+        [FirestoreProperty("Notes")]
+        public string? Notes { get; set; }
+
+
+        [FirestoreProperty("isDiscarded")]
+        public bool isDiscarded { get; set; }
+
+        [FirestoreProperty("Quality")]
+        public string Quality { get; set; } = "Fresh";
+
+
 
     }
 }

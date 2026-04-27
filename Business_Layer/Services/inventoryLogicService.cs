@@ -34,9 +34,10 @@ namespace Business_Layer.Services
                 {
                     InventoryId = entity.InventoryId,
                     IsCustomItem = entity.IsCustomItem,
-                    BarcodeRef = entity.BarcodeRef,           
+                    BarcodeRef = entity.BarcodeRef,
                     Quantity = entity.Quantity,
-                    Status = entity.Status,
+                    Notes = entity.Notes,
+
 
                     // Convert Firestore Timestamps to standard C# DateTimes
                     ExpirationDate = entity.ExpirationDate.ToDateTime(),
@@ -53,7 +54,7 @@ namespace Business_Layer.Services
                 }
                 else
                 {
-   
+
                     dto = await getBarcodedItemForRequest(dto);
 
 
@@ -80,24 +81,27 @@ namespace Business_Layer.Services
         public async Task<bool> AddInventoryItemAsync(AddInventoryItemRequestDto requestDto, string userId)
         {
             var processedDTO = await isCustomItemHelper(requestDto);
-            var inventoryEntity = new Food { 
-             InventoryId = "",
-             IsCustomItem = processedDTO.IsCustomItem,
-             BarcodeRef = processedDTO.BarcodeRef,
-             CustomName = processedDTO.CustomName,
-             CustomCategory = processedDTO.CustomCategory,
-             CustomWeightGrams = processedDTO.CustomWeightGrams,
-             Quantity = processedDTO.Quantity,
-             ExpirationDate = Timestamp.FromDateTime(processedDTO.ExpirationDate.ToUniversalTime()),
-             DateRegistered = Timestamp.FromDateTime(DateTime.UtcNow),
-             Status = "Active"
+            var inventoryEntity = new Food
+            {
+                InventoryId = "",
+                IsCustomItem = processedDTO.IsCustomItem,
+                BarcodeRef = processedDTO.BarcodeRef,
+                CustomName = processedDTO.CustomName,
+                CustomCategory = processedDTO.CustomCategory,
+                CustomWeightGrams = processedDTO.CustomWeightGrams,
+                Quantity = processedDTO.Quantity,
+                Notes = processedDTO.Notes,
+                ExpirationDate = Timestamp.FromDateTime(processedDTO.ExpirationDate.ToUniversalTime()),
+                DateRegistered = Timestamp.FromDateTime(DateTime.UtcNow),
+                isDiscarded = false,
+                Quality = processedDTO.Quality
 
             };
-   
+
             return await _dataService.AddInventoryItemAsync(inventoryEntity, userId);
         }
 
-        public async Task<AddInventoryItemRequestDto>isCustomItemHelper(AddInventoryItemRequestDto requestDto)
+        public async Task<AddInventoryItemRequestDto> isCustomItemHelper(AddInventoryItemRequestDto requestDto)
         {
             if (!requestDto.IsCustomItem)
             {
@@ -121,23 +125,31 @@ namespace Business_Layer.Services
                 requestDto.CustomCategory = requestDto.CustomCategory.Trim();
 
             }
-              
+
             return requestDto;
         }
 
         public async Task<AddInventoryItemRequestDto> getBarcodedItemToAdd(AddInventoryItemRequestDto requestDto)
         {
-           Product prod = await _productDataService.GetProductAsync(requestDto.BarcodeRef);
+            Product prod = await _productDataService.GetProductAsync(requestDto.BarcodeRef);
             requestDto.CustomName = prod.Name;
             requestDto.CustomCategory = prod.Category;
             requestDto.CustomWeightGrams = prod.WeightGrams;
             return requestDto;
         }
 
-    
-
-
-
+        public async Task<bool> DiscardInventoryItemAsync(string inventoryId, string userId)
+        {
+            if(inventoryId == null)
+            {
+                throw new ArgumentNullException("Error No Inventory Id Provided");
+            }
+            if (userId == null)
+            {
+                throw new ArgumentNullException("Error No User Id Provided");
+            }
+            return await _dataService.DiscardFoodItemAsync(inventoryId, userId);
+        }
     }
 }
 
