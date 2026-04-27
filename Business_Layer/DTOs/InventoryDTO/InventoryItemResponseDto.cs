@@ -20,8 +20,11 @@ namespace Business_Layer.DTOs.InventoryDTO
 
         // Instance-specific inventory fields
         public int Quantity { get; set; }
+
+        public string Quality { get; set; } = string.Empty;
+        public string Notes { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime DateRegistered { get; set; }
-        public string Status { get; set; } = string.Empty;
+
     }
 }

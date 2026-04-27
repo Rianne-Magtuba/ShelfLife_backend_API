@@ -52,5 +52,22 @@ namespace ShellLife_backend_API.Controllers
          
             return Ok(pantryDtos);
         }
+
+
+        [HttpDelete]
+        public async Task<IActionResult> discardInventoryItem(string inventoryId, string userid)
+        {
+
+            bool isSucess = await _inventoryLogicService.DiscardInventoryItemAsync(inventoryId, userid);
+
+            if (isSucess)
+            {
+                return Ok(new { Message = "Item succesfully discarded" });
+            }
+            return BadRequest("Failed to discard item");
+        }
+
+
+
     }
 }

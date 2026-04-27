@@ -5,11 +5,12 @@ using Google.Cloud.Firestore.V1;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Data_Layer.Services
 {
-    public class InventoryDataService: IInventoryDataService
+    public class InventoryDataService : IInventoryDataService
     {
         private readonly FirestoreDb _firestoreDb;
 
-        public InventoryDataService(FirestoreDb firestoreDb) {
+        public InventoryDataService(FirestoreDb firestoreDb)
+        {
             _firestoreDb = firestoreDb;
         }
 
@@ -17,12 +18,13 @@ namespace Data_Layer.Services
         public async Task<List<Food>> GetUserInventoryAsync(string userId)
         {
             var collectionRef = _firestoreDb.Collection("Users").Document(userId).Collection("inventory");
-            var snapshot = await collectionRef.GetSnapshotAsync();
+            var query = collectionRef.WhereEqualTo("isDiscarded", false);
+            var snapshot = await query.GetSnapshotAsync();
             var inventoryList = new List<Food>();
 
-            foreach(var document in snapshot.Documents)
+            foreach (var document in snapshot.Documents)
             {
-                if(document.Exists)
+                if (document.Exists)
                 {
                     var inventoryItem = document.ConvertTo<Food>();
                     inventoryList.Add(inventoryItem);
@@ -32,7 +34,7 @@ namespace Data_Layer.Services
             return inventoryList;
 
         }
-    
+
         public async Task<bool> AddInventoryItemAsync(Food item, string userId)
         {
             try
@@ -40,7 +42,7 @@ namespace Data_Layer.Services
                 CollectionReference collectionRef = _firestoreDb.Collection("Users").Document(userId).Collection("inventory");
                 await collectionRef.AddAsync(item);
 
-          
+
                 return true;
             }
             catch (Exception ex)
@@ -50,6 +52,27 @@ namespace Data_Layer.Services
             }
         }
 
-    
+        public async Task<bool> DiscardFoodItemAsync(string inventoryId, string userId)
+        {
+            try
+            {
+                DocumentReference documentRef = _firestoreDb.Collection("Users")
+                                                            .Document(userId)
+                                                            .Collection("inventory")
+                                                            .Document(inventoryId);
+
+                await documentRef.UpdateAsync("isDiscarded", true);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error discarding item: {ex.Message}");
+                return false;
+            }
         }
+
+
+
+    }
 }
