@@ -15,10 +15,21 @@ namespace ShellLife_backend_API.Controllers
             _productLogicService = productLogicService;
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetProducts()
+        {
+            List<ProductRequestDTO> prodList = await _productLogicService.GetProductsAsync();
+            if (prodList == null || prodList.Count == 0)
+            {
+                return Ok(new List<ProductRequestDTO>());
+            }
+            return Ok(prodList);
+        }
         [HttpPost]
         public async Task<IActionResult> registerProduct([FromBody] ProductRequestDTO requestDto) {
 
-           bool isSucess = await _productLogicService.RegisterProductAsync(requestDto);
+            bool isSucess = await _productLogicService.RegisterProductAsync(requestDto);
 
             if (isSucess)
             {
@@ -27,7 +38,7 @@ namespace ShellLife_backend_API.Controllers
             return BadRequest("Failed to register product");
         }
 
-        [HttpGet]
+        [HttpGet("{barcode}")]
         public async Task<IActionResult> getProduct(string barcode)
         {
 
@@ -44,7 +55,11 @@ namespace ShellLife_backend_API.Controllers
             }
         }
 
+
+
     }
 
-
 }
+
+
+    
