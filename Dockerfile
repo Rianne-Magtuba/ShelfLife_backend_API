@@ -15,7 +15,7 @@ COPY Common_Class/Common_Class.csproj                     Common_Class/
 RUN dotnet restore
 
 # Copy the rest of the source code
-COPY ShellLife_backend_API/   ShellLife_backend_API/
+COPY ShelfLife_backend_API/   ShelfLife_backend_API/
 COPY Business_Layer/          Business_Layer/
 COPY Data_Layer/              Data_Layer/
 COPY Common_Class/            Common_Class/
