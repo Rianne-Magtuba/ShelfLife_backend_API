@@ -91,20 +91,22 @@ namespace ShellLife_backend_API
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+      
+     
             if (app.Environment.IsDevelopment())
-            {  
+            {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
+
             app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
-
             app.Run();
         }
     }

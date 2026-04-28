@@ -1,12 +1,13 @@
 ﻿using Business_Layer.DTOs.InventoryDTO;
-
+using Microsoft.AspNetCore.Authorization;
 using Business_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 namespace ShellLife_backend_API.Controllers
 {
+    [Authorize]
     [ApiController] 
     [Route("api/[controller]")]
-    public class InventoryController : ControllerBase // Must inherit from ControllerBase
+    public class InventoryController : BaseController    // Must inherit from ControllerBase
     {
         private readonly inventoryLogicService _inventoryLogicService;
 
@@ -17,10 +18,12 @@ namespace ShellLife_backend_API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> addInventoryItem([FromBody] AddInventoryItemRequestDto requestDto, string userid)
+        public async Task<IActionResult> addInventoryItem([FromBody] AddInventoryItemRequestDto requestDto)
         {
-
-            bool isSucess = await _inventoryLogicService.AddInventoryItemAsync(requestDto, userid);
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
+            bool isSucess = await _inventoryLogicService.AddInventoryItemAsync(requestDto, userId);
 
             if (isSucess)
             {
@@ -31,15 +34,13 @@ namespace ShellLife_backend_API.Controllers
 
 
         [HttpGet("{userId}/pantry")]
-        public async Task<IActionResult> GetUserPantry(string userId)
+        public async Task<IActionResult> GetUserPantry()
         {
-            
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                return BadRequest("User ID cannot be empty."); // Returns a 400 status code
-            }
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
 
-            
+
             List<InventoryItemResponseDto> pantryDtos = await _inventoryLogicService.GetUserPantryAsync(userId);
 
        
@@ -55,10 +56,13 @@ namespace ShellLife_backend_API.Controllers
 
 
         [HttpDelete]
-        public async Task<IActionResult> discardInventoryItem(string inventoryId, string userid)
+        public async Task<IActionResult> discardInventoryItem(string inventoryId)
         {
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
 
-            bool isSucess = await _inventoryLogicService.DiscardInventoryItemAsync(inventoryId, userid);
+            bool isSucess = await _inventoryLogicService.DiscardInventoryItemAsync(inventoryId, userId);
 
             if (isSucess)
             {
