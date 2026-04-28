@@ -47,4 +47,4 @@ jobs:
             ASPNETCORE_ENVIRONMENT=Production
           secrets: |
             /secrets/firebase-sa=firebase-service-account:latest
-            /secrets/jwt-key=shelflife-jwt-key:latest
+            /secrets-jwt/jwt-key=shelflife-jwt-key:latest

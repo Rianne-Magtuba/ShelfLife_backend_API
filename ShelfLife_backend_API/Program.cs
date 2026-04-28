@@ -21,7 +21,7 @@ namespace ShellLife_backend_API
             builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
             // Add services to the container.
 
-            const string jwtKeySecretPath = "/secrets/jwt-key";
+            const string jwtKeySecretPath = "/secrets-jwt/jwt-key";
             if (File.Exists(jwtKeySecretPath))
             {
                 var jwtKey = File.ReadAllText(jwtKeySecretPath).Trim();
