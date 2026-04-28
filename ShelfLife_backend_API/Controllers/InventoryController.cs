@@ -33,7 +33,7 @@ namespace ShellLife_backend_API.Controllers
         }
 
 
-        [HttpGet("{userId}/pantry")]
+        [HttpGet("/pantry")]
         public async Task<IActionResult> GetUserPantry()
         {
             var userId = GetUserId();
