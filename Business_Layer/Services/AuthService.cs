@@ -72,7 +72,8 @@ namespace Business_Layer.Services
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("username", user.Username)
+                new Claim("username", user.Username),
+                 new Claim(JwtRegisteredClaimNames.Sub, user.Id)
             };
 
             var token = new JwtSecurityToken(
