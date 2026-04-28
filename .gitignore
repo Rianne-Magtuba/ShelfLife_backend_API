@@ -25,7 +25,9 @@ x86/
 *.user
 *.userosscache
 *.sln.docstates
-
+**/serviceAccountKey.json
+**/firebase-adminsdk*.json
+*.json.secret
 # IDE
 .vscode/
 .idea/
