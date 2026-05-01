@@ -12,5 +12,6 @@ namespace Business_Layer.Services
         Task<string> RegisterAsync(RegisterDTO dto);
         Task<string> LoginAsync(LoginDTO dto);
         Task<UserProfileDTO> GetProfileByEmailAsync(string email);
+        Task SendPasswordResetAsync(string email);
     }
 }
