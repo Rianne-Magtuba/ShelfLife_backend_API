@@ -4,10 +4,13 @@ using Common_Class.Interfaces;
 using Data_Layer.Configuration;
 using Data_Layer.Extensions;
 using Data_Layer.Services;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
+using System.Text;
+
 
 namespace ShellLife_backend_API
 
@@ -28,6 +31,42 @@ namespace ShellLife_backend_API
                 builder.Configuration["Jwt:Key"] = jwtKey;
             }
 
+            var firestoreOptions = builder.Configuration
+            .GetSection(FirestoreOptions.SectionName)
+            .Get<FirestoreOptions>();
+
+            const string cloudRunSecretPath = "/secrets/firebase-sa";
+
+            string firebasePath = null;
+
+            // Cloud Run
+            if (File.Exists(cloudRunSecretPath))
+            {
+                firebasePath = cloudRunSecretPath;
+            }
+            // Local fallback (same as Firestore DI)
+            else if (!string.IsNullOrEmpty(firestoreOptions?.CredentialsPath)
+                     && File.Exists(firestoreOptions.CredentialsPath))
+            {
+                firebasePath = firestoreOptions.CredentialsPath;
+            }
+
+            // Final safety check
+            if (firebasePath == null)
+            {
+                throw new Exception("Firebase credentials not found (Cloud Run or local)");
+            }
+
+            // Initialize FirebaseApp only once
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                FirebaseApp.Create(new AppOptions
+                {
+                    Credential = GoogleCredential.FromFile(firebasePath)
+                });
+            }
+
+
             builder.Services.AddControllers();
           
 
@@ -38,6 +77,7 @@ namespace ShellLife_backend_API
             builder.Services.AddScoped<ProductLogicService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();
+            builder.Services.AddScoped<FirebaseAuthService>();
 
             builder.Services.Configure<JwtSettings>(
                 builder.Configuration.GetSection("Jwt"));
@@ -73,7 +113,12 @@ namespace ShellLife_backend_API
                 });
             });
 
-            builder.Services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "CustomJwt";
+                options.DefaultChallengeScheme = "CustomJwt";
+            })
+            .AddJwtBearer("CustomJwt", options =>
             {
                 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 
@@ -94,6 +139,13 @@ namespace ShellLife_backend_API
 
                     ValidateLifetime = true
                 };
+            });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("CustomAuth", policy =>
+                    policy.AddAuthenticationSchemes("CustomJwt")
+                          .RequireAuthenticatedUser());
             });
 
             var app = builder.Build();
