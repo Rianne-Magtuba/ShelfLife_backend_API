@@ -14,7 +14,7 @@ namespace Business_Layer.DTOs.InventoryDTO
         public string? CustomName { get; set; }
         public string? CustomCategory { get; set; }
         public double? CustomWeightGrams { get; set; }
- 
+        public double? CustomPrice { get; set; }
 
         // Always required
         public int Quantity { get; set; }

@@ -27,6 +27,9 @@ namespace Common_Class.Entities
         [FirestoreProperty("customWeightGrams")]
         public double? CustomWeightGrams { get; set; }
 
+        [FirestoreProperty("customPrice")]
+        public double? CustomPrice { get; set; }
+
         [FirestoreProperty("quantity")]
         public int Quantity { get; set; }
 

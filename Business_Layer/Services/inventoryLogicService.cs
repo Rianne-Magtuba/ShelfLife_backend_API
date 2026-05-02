@@ -37,8 +37,7 @@ namespace Business_Layer.Services
                     BarcodeRef = entity.BarcodeRef,
                     Quantity = entity.Quantity,
                     Notes = entity.Notes,
-
-
+                    DisplayPrice = entity.CustomPrice ?? 0, // Assuming custom price is the only price for now
                     // Convert Firestore Timestamps to standard C# DateTimes
                     ExpirationDate = entity.ExpirationDate.ToDateTime(),
                     DateRegistered = entity.DateRegistered.ToDateTime()
@@ -89,6 +88,7 @@ namespace Business_Layer.Services
                 CustomName = processedDTO.CustomName,
                 CustomCategory = processedDTO.CustomCategory,
                 CustomWeightGrams = processedDTO.CustomWeightGrams,
+                CustomPrice = processedDTO.CustomPrice,
                 Quantity = processedDTO.Quantity,
                 Notes = processedDTO.Notes,
                 ExpirationDate = Timestamp.FromDateTime(processedDTO.ExpirationDate.ToUniversalTime()),
@@ -123,6 +123,7 @@ namespace Business_Layer.Services
                 requestDto.CustomName = requestDto.CustomName.Trim();
                 requestDto.CustomWeightGrams = Math.Round(requestDto.CustomWeightGrams.Value, 2); // Round weight to 2 decimal places   
                 requestDto.CustomCategory = requestDto.CustomCategory.Trim();
+                requestDto.CustomPrice = requestDto.CustomPrice != null ? Math.Round(requestDto.CustomPrice.Value, 2) : null; // Round price to 2 decimal places if provided
 
             }
 
@@ -135,6 +136,7 @@ namespace Business_Layer.Services
             requestDto.CustomName = prod.Name;
             requestDto.CustomCategory = prod.Category;
             requestDto.CustomWeightGrams = prod.WeightGrams;
+            requestDto.CustomPrice = prod.Price;
             return requestDto;
         }
 
