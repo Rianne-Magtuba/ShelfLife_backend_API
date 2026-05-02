@@ -18,6 +18,8 @@ namespace Business_Layer.DTOs.InventoryDTO
      
         public double? WeightGrams { get; set; }
 
+        public double DisplayPrice { get; set; }
+
         // Instance-specific inventory fields
         public int Quantity { get; set; }
 

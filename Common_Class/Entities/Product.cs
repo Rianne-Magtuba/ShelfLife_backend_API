@@ -19,9 +19,14 @@ namespace Common_Class.Entities
         [FirestoreProperty("weightGrams")]
         public double WeightGrams { get; set; }
 
+        [FirestoreProperty("price")]
+        public double Price { get; set; }
+
         // Server-controlled audit field
         [FirestoreProperty("dateAdded")]
         public Timestamp DateAdded { get; set; }
+
+
 
     }
 }

@@ -5,7 +5,7 @@ using Business_Layer.DTOs.ProductDTO;
 namespace ShellLife_backend_API.Controllers
 {
     [ApiController]
-    [Route("/api[controller]")]
+    [Route("/api/[controller]")]
     public class ProductController : ControllerBase
     {
         private readonly ProductLogicService _productLogicService;

@@ -27,9 +27,9 @@ namespace Business_Layer.Services
             {
                 Barcode = requestDto.Barcode,
                 Name = requestDto.Name,
-
                 Category = requestDto.Category,
                 WeightGrams = requestDto.WeightGrams,
+                Price = requestDto.Price,
 
                 // THE SERVER GENERATES THE TIMESTAMP HERE
                 DateAdded = Timestamp.GetCurrentTimestamp()
@@ -47,8 +47,9 @@ namespace Business_Layer.Services
             {
                 Barcode = productEntity.Barcode,
                 Name = productEntity.Name,
-                Category = productEntity.Category,
-                WeightGrams = productEntity.WeightGrams
+                Category = productEntity.Category,    
+                WeightGrams = productEntity.WeightGrams,
+                Price = productEntity.Price,
             };
 
             return prodRequest;
@@ -67,7 +68,9 @@ namespace Business_Layer.Services
                     Name = product.Name,
                     Category = product.Category,
                    
-                    WeightGrams = product.WeightGrams
+                    WeightGrams = product.WeightGrams,
+                    Price = product.Price,
+
                 };
                 productDTOs.Add(dto);
             }
