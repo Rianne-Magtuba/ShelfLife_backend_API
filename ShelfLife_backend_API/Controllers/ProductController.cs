@@ -55,7 +55,29 @@ namespace ShellLife_backend_API.Controllers
             }
         }
 
+        [HttpPut("{barcode}")]
+        public async Task<IActionResult> UpdateProduct(string barcode,[FromBody] ProductRequestDTO requestDto)
+        {
+            if (barcode != requestDto.Barcode)
+            {
+                return BadRequest("Barcode mismatch");
+            }
 
+            var success = await _productLogicService.UpdateProductAsync(requestDto);
+
+            if (!success)
+            {
+                return NotFound(new
+                {
+                    Message = "Product not found"
+                });
+            }
+
+            return Ok(new
+            {
+                Message = "Product updated successfully"
+            });
+        }
 
     }
 

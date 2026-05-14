@@ -15,5 +15,6 @@ namespace Common_Class.Interfaces
         public Task<Product> GetProductAsync(string barcode);
 
         public Task<List<Product>> getProductsAsync();
+        Task<bool> UpdateProductAsync(Product product);
     }
 }

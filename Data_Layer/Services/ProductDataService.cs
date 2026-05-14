@@ -71,5 +71,31 @@ namespace Data_Layer.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<bool> UpdateProductAsync(Product product)
+        {
+            try
+            {
+                var documentRef = _firestoreDb
+                    .Collection("Product Catalog")
+                    .Document(product.Barcode);
+
+                var snapshot = await documentRef.GetSnapshotAsync();
+
+                if (!snapshot.Exists)
+                {
+                    return false;
+                }
+
+                await documentRef.SetAsync(product, SetOptions.Overwrite);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating product: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

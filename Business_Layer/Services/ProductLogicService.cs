@@ -77,5 +77,30 @@ namespace Business_Layer.Services
             return productDTOs;
         }
 
+        public async Task<bool> UpdateProductAsync(ProductRequestDTO requestDto)
+        {
+            if (requestDto == null)
+                throw new ArgumentNullException(nameof(requestDto));
+
+            var existingProduct = await _dataService.GetProductAsync(requestDto.Barcode);
+
+            if (existingProduct == null)
+                return false;
+
+            var updatedProduct = new Product
+            {
+                Barcode = requestDto.Barcode,
+                Name = requestDto.Name,
+                Category = requestDto.Category,
+                WeightGrams = requestDto.WeightGrams,
+                Price = requestDto.Price,
+
+                // preserve original date
+                DateAdded = existingProduct.DateAdded
+            };
+
+            return await _dataService.UpdateProductAsync(updatedProduct);
+        }
+
     }
 }
