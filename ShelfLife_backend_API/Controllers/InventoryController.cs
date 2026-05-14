@@ -71,7 +71,30 @@ namespace ShellLife_backend_API.Controllers
             return BadRequest("Failed to discard item");
         }
 
+        [HttpPut("{inventoryId}")]
+        public async Task<IActionResult> UpdateInventoryItem(string inventoryId, [FromBody] AddInventoryItemRequestDto requestDto)
+        {
+            var userId = GetUserId();
 
+            if (userId == null)
+                return Unauthorized();
+
+            bool isSuccess = await _inventoryLogicService
+                .UpdateInventoryItemAsync(inventoryId, requestDto, userId);
+
+            if (!isSuccess)
+            {
+                return NotFound(new
+                {
+                    Message = "Inventory item not found"
+                });
+            }
+
+            return Ok(new
+            {
+                Message = "Inventory item updated successfully"
+            });
+        }
 
     }
 }

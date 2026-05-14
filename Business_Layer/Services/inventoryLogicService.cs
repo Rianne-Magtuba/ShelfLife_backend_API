@@ -152,6 +152,53 @@ namespace Business_Layer.Services
             }
             return await _dataService.DiscardFoodItemAsync(inventoryId, userId);
         }
+
+        public async Task<bool> UpdateInventoryItemAsync(string inventoryId, AddInventoryItemRequestDto requestDto, string userId)
+        {
+            if (string.IsNullOrEmpty(inventoryId))
+            {
+                throw new ArgumentNullException(nameof(inventoryId));
+            }
+
+            var existingItems = await _dataService.GetUserInventoryAsync(userId);
+
+            var existingItem = existingItems
+                .FirstOrDefault(x => x.InventoryId == inventoryId);
+
+            if (existingItem == null)
+            {
+                return false;
+            }
+
+            var processedDTO = await isCustomItemHelper(requestDto);
+
+            var updatedEntity = new Food
+            {
+                InventoryId = inventoryId,
+
+                IsCustomItem = processedDTO.IsCustomItem,
+                BarcodeRef = processedDTO.BarcodeRef,
+
+                CustomName = processedDTO.CustomName,
+                CustomCategory = processedDTO.CustomCategory,
+                CustomWeightGrams = processedDTO.CustomWeightGrams,
+                CustomPrice = processedDTO.CustomPrice,
+
+                Quantity = processedDTO.Quantity,
+                Notes = processedDTO.Notes,
+                Quality = processedDTO.Quality,
+
+                ExpirationDate = Timestamp.FromDateTime(
+                    processedDTO.ExpirationDate.ToUniversalTime()
+                ),
+
+                // preserve original
+                DateRegistered = existingItem.DateRegistered,
+                isDiscarded = existingItem.isDiscarded
+            };
+
+            return await _dataService.UpdateInventoryItemAsync(updatedEntity, userId);
+        }
     }
 }
 
