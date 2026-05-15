@@ -79,66 +79,67 @@ namespace Business_Layer.Services
 
         public async Task<bool> AddInventoryItemAsync(AddInventoryItemRequestDto requestDto, string userId)
         {
-            var processedDTO = await isCustomItemHelper(requestDto);
+            //var processedDTO = await isCustomItemHelper(requestDto);
             var inventoryEntity = new Food
             {
                 InventoryId = "",
-                IsCustomItem = processedDTO.IsCustomItem,
-                BarcodeRef = processedDTO.BarcodeRef,
-                CustomName = processedDTO.CustomName,
-                CustomCategory = processedDTO.CustomCategory,
-                CustomWeightGrams = processedDTO.CustomWeightGrams,
-                CustomPrice = processedDTO.CustomPrice,
-                Quantity = processedDTO.Quantity,
-                Notes = processedDTO.Notes,
-                ExpirationDate = Timestamp.FromDateTime(processedDTO.ExpirationDate.ToUniversalTime()),
+                IsCustomItem = requestDto.IsCustomItem,
+                BarcodeRef = requestDto.BarcodeRef,
+                CustomName = requestDto.CustomName,
+                CustomCategory = requestDto.CustomCategory, 
+                CustomWeightGrams = requestDto.CustomWeightGrams,
+                CustomPrice = Math.Round(requestDto.CustomWeightGrams.Value, 2),
+                Quantity = requestDto.Quantity,
+                Notes = requestDto.Notes,
+                ExpirationDate = Timestamp.FromDateTime(requestDto.ExpirationDate.ToUniversalTime()),
                 DateRegistered = Timestamp.FromDateTime(DateTime.UtcNow),
                 isDiscarded = false,
-                Quality = processedDTO.Quality
+                Quality = requestDto.Quality
 
             };
 
             return await _dataService.AddInventoryItemAsync(inventoryEntity, userId);
         }
 
-        public async Task<AddInventoryItemRequestDto> isCustomItemHelper(AddInventoryItemRequestDto requestDto)
-        {
-            if (!requestDto.IsCustomItem)
-            {
-                if (string.IsNullOrEmpty(requestDto.BarcodeRef))
-                {
-                    throw new ArgumentException("Barcoded items must have a barcode reference.");
+        //public async Task<AddInventoryItemRequestDto> isCustomItemHelper(AddInventoryItemRequestDto requestDto)
+        //{
+        //    if (!requestDto.IsCustomItem)
+        //    {
+        //        if (string.IsNullOrEmpty(requestDto.BarcodeRef))
+        //        {
+        //            throw new ArgumentException("Barcoded items must have a barcode reference.");
 
-                }
+        //        }
 
-                requestDto = await getBarcodedItemToAdd(requestDto);
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(requestDto.CustomName) || string.IsNullOrEmpty(requestDto.CustomCategory) || requestDto.CustomWeightGrams == null)
-                {
-                    throw new ArgumentException("Custom items must have a name, category, and weight.");
-                }
-                requestDto.BarcodeRef = null; // Ensure barcode is null for custom items
-                requestDto.CustomName = requestDto.CustomName.Trim();
-                requestDto.CustomWeightGrams = Math.Round(requestDto.CustomWeightGrams.Value, 2); // Round weight to 2 decimal places   
-                requestDto.CustomCategory = requestDto.CustomCategory.Trim();
-                requestDto.CustomPrice = requestDto.CustomPrice != null ? Math.Round(requestDto.CustomPrice.Value, 2) : null; // Round price to 2 decimal places if provided
+        //        requestDto = await getBarcodedItemToAdd(requestDto);
+        //    }
+        //    else
+        //    {
+        //        if (string.IsNullOrEmpty(requestDto.CustomName) || string.IsNullOrEmpty(requestDto.CustomCategory) || requestDto.CustomWeightGrams == null)
+        //        {
+        //            throw new ArgumentException("Custom items must have a name, category, and weight.");
+        //        }
 
-            }
+        //        requestDto.BarcodeRef = null; // Ensure barcode is null for custom items
+        //        requestDto.CustomName = requestDto.CustomName.Trim();
+        //        requestDto.CustomWeightGrams = Math.Round(requestDto.CustomWeightGrams.Value, 2); // Round weight to 2 decimal places   
+        //        requestDto.CustomCategory = requestDto.CustomCategory.Trim();
+        //        requestDto.CustomPrice = requestDto.CustomPrice != null ? Math.Round(requestDto.CustomPrice.Value, 2) : null; // Round price to 2 decimal places if provided
 
-            return requestDto;
-        }
+        //    }
 
-        public async Task<AddInventoryItemRequestDto> getBarcodedItemToAdd(AddInventoryItemRequestDto requestDto)
-        {
-            Product prod = await _productDataService.GetProductAsync(requestDto.BarcodeRef);
-            requestDto.CustomName = prod.Name;
-            requestDto.CustomCategory = prod.Category;
-            requestDto.CustomWeightGrams = prod.WeightGrams;
-            requestDto.CustomPrice = prod.Price;
-            return requestDto;
-        }
+        //    return requestDto;
+        //}
+
+        //public async Task<AddInventoryItemRequestDto> getBarcodedItemToAdd(AddInventoryItemRequestDto requestDto)
+        //{
+        //    Product prod = await _productDataService.GetProductAsync(requestDto.BarcodeRef);
+        //    requestDto.CustomName = prod.Name;
+        //    requestDto.CustomCategory = prod.Category;
+        //    requestDto.CustomWeightGrams = prod.WeightGrams;
+        //    requestDto.CustomPrice = prod.Price;
+        //    return requestDto;
+        //}
 
         public async Task<bool> DiscardInventoryItemAsync(string inventoryId, string userId)
         {

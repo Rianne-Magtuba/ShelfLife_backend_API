@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: transparent; /* Essential for OBS */
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 24px;
+    text-shadow: 1px 1px 2px black;
+  }
+  .comment-container {
+    position: absolute;
+    bottom: -500px; /* Start below the screen */
+    left: 20px;
+    width: 600px;
+    animation: scrollUp 15s linear infinite;
+  }
+  .comment {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .username {
+    font-weight: bold;
+    color: #e0e0e0;
+    font-size: 20px;
+  }
+  @keyframes scrollUp {
+    0% { bottom: -500px; }
+    100% { bottom: 1920px; } /* Scroll all the way up a 1080x1920 canvas */
+  }
+</style>
+</head>
+<body>
+  <div class="comment-container">
+    <div class="comment">
+      <span class="username">user89234</span>
+      <span>Wait, this beneficiary management system looks so clean.</span>
+    </div>
+    <div class="comment">
+      <span class="username">dev_guy</span>
+      <span>CSWDO Biñan needs this ASAP 🔥</span>
+    </div>
+    <div class="comment">
+      <span class="username">tech_bro99</span>
+      <span>Is the backend using ASP.NET?</span>
+    </div>
+    <div class="comment">
+      <span class="username">research_student</span>
+      <span>Bro is carrying the whole presentation right now.</span>
+    </div>
+    <div class="comment">
+      <span class="username">mayor_fan</span>
+      <span>SERVE is going to make the queues so much faster!</span>
+    </div>
+  </div>
+</body>
+</html>
