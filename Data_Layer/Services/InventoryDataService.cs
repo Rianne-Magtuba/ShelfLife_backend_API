@@ -72,6 +72,33 @@ namespace Data_Layer.Services
             }
         }
 
+        public async Task<bool> UpdateInventoryItemAsync(Food item, string userId)
+        {
+            try
+            {
+                DocumentReference documentRef = _firestoreDb
+                    .Collection("Users")
+                    .Document(userId)
+                    .Collection("inventory")
+                    .Document(item.InventoryId);
+
+                var snapshot = await documentRef.GetSnapshotAsync();
+
+                if (!snapshot.Exists)
+                {
+                    return false;
+                }
+
+                await documentRef.SetAsync(item, SetOptions.Overwrite);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating inventory item: {ex.Message}");
+                return false;
+            }
+        }
 
 
     }
