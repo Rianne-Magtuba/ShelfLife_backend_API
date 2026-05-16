@@ -47,7 +47,10 @@ namespace ShellLife_backend_API.Controllers
                 return BadRequest("Barcode cannot be null or empty");
             }
             ProductRequestDTO prod = await _productLogicService.GetProductAsync(barcode);
-
+            if (prod == null)
+            {
+                return NotFound(); // This tells your Flutter app the product is new!
+            }
             {
                 return Ok(prod);
 

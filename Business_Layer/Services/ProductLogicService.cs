@@ -42,7 +42,10 @@ namespace Business_Layer.Services
         {
             if (string.IsNullOrEmpty(barcode)) throw new ArgumentException("Barcode cannot be null or empty.", nameof(barcode));
             var productEntity = await _dataService.GetProductAsync(barcode);
-
+            if (productEntity == null)
+            {
+                return null;
+            }
             var prodRequest = new ProductRequestDTO
             {
                 Barcode = productEntity.Barcode,

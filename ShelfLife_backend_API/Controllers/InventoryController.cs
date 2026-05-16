@@ -55,7 +55,7 @@ namespace ShellLife_backend_API.Controllers
         }
 
 
-        [HttpDelete]
+        [HttpDelete("{inventoryId}")]
         public async Task<IActionResult> discardInventoryItem(string inventoryId)
         {
             var userId = GetUserId();
