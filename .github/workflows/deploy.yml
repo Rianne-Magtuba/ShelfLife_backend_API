@@ -48,3 +48,4 @@ jobs:
           secrets: |
             /secrets/firebase-sa=firebase-service-account:latest
             /secrets-jwt/jwt-key=shelflife-jwt-key:latest
+            /secrets-email/app-password=shelflife-email-password:latest
