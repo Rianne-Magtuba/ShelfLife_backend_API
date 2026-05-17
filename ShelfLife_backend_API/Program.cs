@@ -32,6 +32,12 @@ namespace ShellLife_backend_API
                 builder.Configuration["Jwt:Key"] = jwtKey;
             }
 
+            const string emailPasswordSecretPath = "/secrets-email/app-password";
+            if (File.Exists(emailPasswordSecretPath))
+            {
+                var emailPassword = File.ReadAllText(emailPasswordSecretPath).Trim();
+                builder.Configuration["EmailSettings:AppPassword"] = emailPassword;
+            }
             var firestoreOptions = builder.Configuration
             .GetSection(FirestoreOptions.SectionName)
             .Get<FirestoreOptions>();
