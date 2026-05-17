@@ -77,28 +77,57 @@ namespace Business_Layer.Services
 
 
 
-        public async Task<bool> AddInventoryItemAsync(AddInventoryItemRequestDto requestDto, string userId)
+        public async Task<InventoryItemResponseDto?> AddInventoryItemAsync(AddInventoryItemRequestDto requestDto, string userId)
         {
-            //var processedDTO = await isCustomItemHelper(requestDto);
+            // 1. Map Request DTO to Entity
             var inventoryEntity = new Food
             {
                 InventoryId = "",
                 IsCustomItem = requestDto.IsCustomItem,
                 BarcodeRef = requestDto.BarcodeRef,
                 CustomName = requestDto.CustomName,
-                CustomCategory = requestDto.CustomCategory, 
+                CustomCategory = requestDto.CustomCategory,
                 CustomWeightGrams = requestDto.CustomWeightGrams,
-                CustomPrice = Math.Round(requestDto.CustomWeightGrams.Value, 2),
+                // (Note: Double check this line in your original code, it maps weight to price)
+                CustomPrice = requestDto.CustomPrice,
                 Quantity = requestDto.Quantity,
                 Notes = requestDto.Notes,
                 ExpirationDate = Timestamp.FromDateTime(requestDto.ExpirationDate.ToUniversalTime()),
                 DateRegistered = Timestamp.FromDateTime(DateTime.UtcNow),
                 isDiscarded = false,
                 Quality = requestDto.Quality
-
             };
 
-            return await _dataService.AddInventoryItemAsync(inventoryEntity, userId);
+            // 2. Call Data Layer and get the saved entity (which now includes docRef.Id)
+            Food? savedFood = await _dataService.AddInventoryItemAsync(inventoryEntity, userId);
+
+            if (savedFood == null)
+            {
+                return null; // Database operation failed
+            }
+
+            // 3. Map the saved Entity back to the Response DTO
+            var responseDto = new InventoryItemResponseDto
+            {
+                InventoryId = savedFood.InventoryId, // The real Firestore ID
+                IsCustomItem = savedFood.IsCustomItem,
+                BarcodeRef = savedFood.BarcodeRef,
+
+                // Map your entity fields to your unified display fields
+                DisplayName = savedFood.CustomName ?? string.Empty,
+                DisplayCategory = savedFood.CustomCategory ?? string.Empty,
+                WeightGrams = savedFood.CustomWeightGrams,
+                DisplayPrice = savedFood.CustomPrice ?? 0.0,
+                Quantity = savedFood.Quantity,
+                Quality = savedFood.Quality,
+                Notes = savedFood.Notes ?? string.Empty,
+
+                // Convert Firestore Timestamps back to C# DateTime for the JSON response
+                ExpirationDate = savedFood.ExpirationDate.ToDateTime(),
+                DateRegistered = savedFood.DateRegistered.ToDateTime()
+            };
+
+            return responseDto;
         }
 
         //public async Task<AddInventoryItemRequestDto> isCustomItemHelper(AddInventoryItemRequestDto requestDto)

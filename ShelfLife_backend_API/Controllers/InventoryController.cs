@@ -23,12 +23,14 @@ namespace ShellLife_backend_API.Controllers
             var userId = GetUserId();
             if (userId == null)
                 return Unauthorized();
-            bool isSucess = await _inventoryLogicService.AddInventoryItemAsync(requestDto, userId);
+            InventoryItemResponseDto? createdItem = await _inventoryLogicService.AddInventoryItemAsync(requestDto, userId);
 
-            if (isSucess)
+            if (createdItem != null)
             {
-                return Ok(new { Message = "Item succesfully added" });
+                // Return the DTO directly. .NET will automatically serialize this into JSON!
+                return Ok(createdItem);
             }
+
             return BadRequest("Failed to add item");
         }
 

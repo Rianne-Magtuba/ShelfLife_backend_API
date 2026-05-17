@@ -9,7 +9,7 @@ namespace Common_Class.Interfaces
     {
         Task<List<Food>> GetUserInventoryAsync(string userId);
 
-        Task<bool> AddInventoryItemAsync(Food item, string userId);
+        Task<Food> AddInventoryItemAsync(Food item, string userId);
 
         Task<bool> DiscardFoodItemAsync(string inventoryId, string userId);
         Task<bool> UpdateInventoryItemAsync(Food item, string userId);
