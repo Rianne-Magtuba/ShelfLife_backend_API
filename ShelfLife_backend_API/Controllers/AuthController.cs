@@ -93,7 +93,7 @@ namespace ShelfLife_backend_API.Controllers
 
                 return Ok(new
                 {
-                    message = "Password reset link has been generated"
+                    message = "Password reset link has been sent to your email"
                 });
             }
             catch (Exception ex)
