@@ -22,13 +22,14 @@ namespace Business_Layer.Services
     {
         private readonly IUserDataService _repo;
         private readonly JwtSettings _jwt;
-        private readonly ILogger<AuthService> _logger;
+        private readonly EmailService _emailService;
 
-        public AuthService(IUserDataService repo, IOptions<JwtSettings> jwtOptions, ILogger<AuthService> logger)
+
+        public AuthService(IUserDataService repo, IOptions<JwtSettings> jwtOptions, EmailService emailService)
         {
             _jwt = jwtOptions.Value;
             _repo = repo;
-            _logger = logger;
+            _emailService = emailService;
         }
 
         public async Task<string> RegisterAsync(RegisterDTO dto)
@@ -115,15 +116,19 @@ namespace Business_Layer.Services
 
         public async Task SendPasswordResetAsync(string email)
         {
-            var auth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
+            var auth = FirebaseAuth.DefaultInstance;
 
-            _logger.LogInformation("Generating reset link for {Email}", email);
+            var user = await auth.GetUserByEmailAsync(email);
 
-            await auth.GetUserByEmailAsync(email);
+            if (user == null)
+                throw new Exception("User not found");
 
-            var resetLink = await auth.GeneratePasswordResetLinkAsync(email);
+            var resetLink =
+                await auth.GeneratePasswordResetLinkAsync(email);
 
-            _logger.LogInformation("RESET LINK: {ResetLink}", resetLink);
+            await _emailService.SendResetPasswordEmail(
+                email,
+                resetLink);
         }
     }
 }
