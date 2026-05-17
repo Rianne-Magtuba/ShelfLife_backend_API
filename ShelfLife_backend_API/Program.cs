@@ -1,5 +1,6 @@
 
 using Business_Layer.Services;
+using Business_Layer.Settings;
 using Common_Class.Interfaces;
 using Data_Layer.Configuration;
 using Data_Layer.Extensions;
@@ -78,9 +79,13 @@ namespace ShellLife_backend_API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();
             builder.Services.AddScoped<FirebaseAuthService>();
+            builder.Services.AddScoped<EmailService>();
 
             builder.Services.Configure<JwtSettings>(
                 builder.Configuration.GetSection("Jwt"));
+
+            builder.Services.Configure<EmailSettings>(
+                builder.Configuration.GetSection("EmailSettings"));
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
