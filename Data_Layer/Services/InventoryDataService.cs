@@ -35,20 +35,35 @@ namespace Data_Layer.Services
 
         }
 
-        public async Task<bool> AddInventoryItemAsync(Food item, string userId)
+        public async Task<Food> AddInventoryItemAsync(Food item, string userId)
         {
             try
             {
                 CollectionReference collectionRef = _firestoreDb.Collection("Users").Document(userId).Collection("inventory");
-                await collectionRef.AddAsync(item);
+                DocumentReference docRef = await collectionRef.AddAsync(item);
 
-
-                return true;
+                var food = new Food
+                {
+                    InventoryId = docRef.Id,
+                    IsCustomItem = item.IsCustomItem,
+                    BarcodeRef = item.BarcodeRef,
+                    CustomName = item.CustomName,
+                    CustomCategory = item.CustomCategory,
+                    CustomWeightGrams = item.CustomWeightGrams,
+                    CustomPrice = item.CustomPrice,
+                    Quantity = item.Quantity,
+                    ExpirationDate = item.ExpirationDate,
+                    DateRegistered = item.DateRegistered,
+                    Notes = item.Notes,
+                    isDiscarded = item.isDiscarded,
+                    Quality = item.Quality
+                };
+                return food;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding item: {ex.Message}");
-                return false;
+                return null;
             }
         }
 
