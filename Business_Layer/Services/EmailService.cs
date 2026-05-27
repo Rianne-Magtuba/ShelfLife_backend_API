@@ -18,6 +18,16 @@ namespace Business_Layer.Services
         public EmailService(IOptions<EmailSettings> options)
         {
             _settings = options.Value;
+            // ── ADD THESE CHECKS ─────────────────────────────────────────────────
+            if (string.IsNullOrEmpty(_settings.SenderEmail))
+                throw new InvalidOperationException(
+                    "EmailSettings:SenderEmail is not configured. " +
+                    "Check appsettings.Production.json and Secret Manager.");
+
+            if (string.IsNullOrEmpty(_settings.AppPassword))
+                throw new InvalidOperationException(
+                    "EmailSettings:AppPassword is not configured. " +
+                    "Check Secret Manager mount at /secrets-email/app-password.");
         }
 
         public async Task SendResetPasswordEmail(

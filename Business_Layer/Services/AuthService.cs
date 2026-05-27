@@ -118,7 +118,15 @@ namespace Business_Layer.Services
         {
             var auth = FirebaseAuth.DefaultInstance;
 
-            var user = await auth.GetUserByEmailAsync(email);
+            UserRecord user;
+            try
+            {
+                user = await auth.GetUserByEmailAsync(email);
+            }
+            catch (FirebaseAuthException)
+            {
+                throw new Exception("No account found with that email address");
+            }
 
             if (user == null)
                 throw new Exception("User not found");
