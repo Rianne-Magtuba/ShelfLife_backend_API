@@ -18,7 +18,7 @@ namespace Business_Layer.Services
         public EmailService(IOptions<EmailSettings> options)
         {
             _settings = options.Value;
-            // ── ADD THESE CHECKS ─────────────────────────────────────────────────
+      
             if (string.IsNullOrEmpty(_settings.SenderEmail))
                 throw new InvalidOperationException(
                     "EmailSettings:SenderEmail is not configured. " +

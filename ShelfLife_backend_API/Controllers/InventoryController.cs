@@ -73,6 +73,24 @@ namespace ShellLife_backend_API.Controllers
             return BadRequest("Failed to discard item");
         }
 
+        
+        [HttpDelete("{inventoryId}/consume")]
+        public async Task<IActionResult> consumeInventoryItem(string inventoryId)
+        {
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            bool isSucess = await _inventoryLogicService.ConsumeInventoryItemAsync(inventoryId, userId);
+
+            if (isSucess)
+            {
+                return Ok(new { Message = "Item succesfully consumed" });
+            }
+            return BadRequest("Failed to consumed item");
+        }
+
+
         [HttpPut("{inventoryId}")]
         public async Task<IActionResult> UpdateInventoryItem(string inventoryId, [FromBody] AddInventoryItemRequestDto requestDto)
         {

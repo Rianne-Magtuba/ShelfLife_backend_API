@@ -95,6 +95,7 @@ namespace Business_Layer.Services
                 ExpirationDate = Timestamp.FromDateTime(requestDto.ExpirationDate.ToUniversalTime()),
                 DateRegistered = Timestamp.FromDateTime(DateTime.UtcNow),
                 isDiscarded = false,
+                isConsumed = false,
                 Quality = requestDto.Quality
             };
 
@@ -130,45 +131,7 @@ namespace Business_Layer.Services
             return responseDto;
         }
 
-        //public async Task<AddInventoryItemRequestDto> isCustomItemHelper(AddInventoryItemRequestDto requestDto)
-        //{
-        //    if (!requestDto.IsCustomItem)
-        //    {
-        //        if (string.IsNullOrEmpty(requestDto.BarcodeRef))
-        //        {
-        //            throw new ArgumentException("Barcoded items must have a barcode reference.");
 
-        //        }
-
-        //        requestDto = await getBarcodedItemToAdd(requestDto);
-        //    }
-        //    else
-        //    {
-        //        if (string.IsNullOrEmpty(requestDto.CustomName) || string.IsNullOrEmpty(requestDto.CustomCategory) || requestDto.CustomWeightGrams == null)
-        //        {
-        //            throw new ArgumentException("Custom items must have a name, category, and weight.");
-        //        }
-
-        //        requestDto.BarcodeRef = null; // Ensure barcode is null for custom items
-        //        requestDto.CustomName = requestDto.CustomName.Trim();
-        //        requestDto.CustomWeightGrams = Math.Round(requestDto.CustomWeightGrams.Value, 2); // Round weight to 2 decimal places   
-        //        requestDto.CustomCategory = requestDto.CustomCategory.Trim();
-        //        requestDto.CustomPrice = requestDto.CustomPrice != null ? Math.Round(requestDto.CustomPrice.Value, 2) : null; // Round price to 2 decimal places if provided
-
-        //    }
-
-        //    return requestDto;
-        //}
-
-        //public async Task<AddInventoryItemRequestDto> getBarcodedItemToAdd(AddInventoryItemRequestDto requestDto)
-        //{
-        //    Product prod = await _productDataService.GetProductAsync(requestDto.BarcodeRef);
-        //    requestDto.CustomName = prod.Name;
-        //    requestDto.CustomCategory = prod.Category;
-        //    requestDto.CustomWeightGrams = prod.WeightGrams;
-        //    requestDto.CustomPrice = prod.Price;
-        //    return requestDto;
-        //}
 
         public async Task<bool> DiscardInventoryItemAsync(string inventoryId, string userId)
         {
@@ -181,6 +144,19 @@ namespace Business_Layer.Services
                 throw new ArgumentNullException("Error No User Id Provided");
             }
             return await _dataService.DiscardFoodItemAsync(inventoryId, userId);
+        }
+
+        public async Task<bool> ConsumeInventoryItemAsync(string inventoryId, string userId)
+        {
+            if (inventoryId == null)
+            {
+                throw new ArgumentNullException("Error No Inventory Id Provided");
+            }
+            if (userId == null)
+            {
+                throw new ArgumentNullException("Error No User Id Provided");
+            }
+            return await _dataService.ConsumeFoddItemAsync(inventoryId, userId);
         }
 
         public async Task<bool> UpdateInventoryItemAsync(string inventoryId, AddInventoryItemRequestDto requestDto, string userId)
@@ -224,7 +200,8 @@ namespace Business_Layer.Services
 
                 // preserve original
                 DateRegistered = existingItem.DateRegistered,
-                isDiscarded = existingItem.isDiscarded
+                isDiscarded = existingItem.isDiscarded,
+                isConsumed = existingItem.isConsumed
             };
 
             return await _dataService.UpdateInventoryItemAsync(updatedEntity, userId);
