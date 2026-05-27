@@ -47,8 +47,13 @@ namespace Common_Class.Entities
         [FirestoreProperty("isDiscarded")]
         public bool isDiscarded { get; set; }
 
+        [FirestoreProperty("isConsumed")]
+        public bool isConsumed { get; set; }
+
         [FirestoreProperty("Quality")]
         public string Quality { get; set; } = "Fresh";
+
+
 
 
 

@@ -18,7 +18,9 @@ namespace Data_Layer.Services
         public async Task<List<Food>> GetUserInventoryAsync(string userId)
         {
             var collectionRef = _firestoreDb.Collection("Users").Document(userId).Collection("inventory");
-            var query = collectionRef.WhereEqualTo("isDiscarded", false);
+            var query = collectionRef.
+                WhereEqualTo("isDiscarded", false).
+                WhereEqualTo("isConsumed", false);
             var snapshot = await query.GetSnapshotAsync();
             var inventoryList = new List<Food>();
 
@@ -115,6 +117,24 @@ namespace Data_Layer.Services
             }
         }
 
+        public async Task<bool> ConsumeFoddItemAsync(string inventoryId, string userId)
+        {
+            try
+            {
+                DocumentReference documentRef = _firestoreDb.Collection("Users")
+                                                            .Document(userId)
+                                                            .Collection("inventory")
+                                                            .Document(inventoryId);
 
+                await documentRef.UpdateAsync("isConsumed", true);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error discarding item: {ex.Message}");
+                return false;
+            }
+        }
     }
 }
