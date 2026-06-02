@@ -9,6 +9,10 @@ namespace Common_Class.Interfaces
     {
         Task<List<Food>> GetUserInventoryAsync(string userId);
 
+        public  Task<List<Food>> GetDiscardedItemAsync(string userId);
+
+        public Task<List<Food>> GetConsumedItemAsync(string userId);
+
         Task<Food> AddInventoryItemAsync(Food item, string userId);
 
         Task<bool> DiscardFoodItemAsync(string inventoryId, string userId);

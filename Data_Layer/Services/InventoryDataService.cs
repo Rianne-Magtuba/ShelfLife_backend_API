@@ -37,6 +37,47 @@ namespace Data_Layer.Services
 
         }
 
+
+        public async Task<List<Food>> GetDiscardedItemAsync(string userId)
+        {
+            var collectionRef = _firestoreDb.Collection("Users").Document(userId).Collection("inventory");
+            var query = collectionRef.WhereEqualTo("isDiscarded", true);
+
+            var snapshot = await query.GetSnapshotAsync();
+            var inventoryList = new List<Food>();
+
+            foreach (var document in snapshot.Documents)
+            {
+                if (document.Exists)
+                {
+                    var inventoryItem = document.ConvertTo<Food>();
+                    inventoryList.Add(inventoryItem);
+                }
+            }
+
+            return inventoryList;
+
+        }
+
+        public async Task<List<Food>> GetConsumedItemAsync(string userId)
+        {
+            var collectionRef = _firestoreDb.Collection("Users").Document(userId).Collection("inventory");
+            var query = collectionRef.WhereEqualTo("isConsumed", true);
+            var snapshot = await query.GetSnapshotAsync();
+            var inventoryList = new List<Food>();
+
+            foreach (var document in snapshot.Documents)
+            {
+                if (document.Exists)
+                {
+                    var inventoryItem = document.ConvertTo<Food>();
+                    inventoryList.Add(inventoryItem);
+                }
+            }
+
+            return inventoryList;
+
+        }
         public async Task<Food> AddInventoryItemAsync(Food item, string userId)
         {
             try

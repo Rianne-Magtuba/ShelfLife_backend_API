@@ -43,23 +43,84 @@ namespace Business_Layer.Services
                     DateRegistered = entity.DateRegistered.ToDateTime()
                 };
 
-                // Apply our Hybrid Business Logic to figure out what Name/Category to display
-                if (entity.IsCustomItem)
-                {
-                    // It's a custom item (e.g., Wet Market Fish). Use the locally stored data.
                     dto.DisplayName = entity.CustomName ?? "Unknown Custom Item";
                     dto.DisplayCategory = entity.CustomCategory ?? "Uncategorized";
                     dto.WeightGrams = entity.CustomWeightGrams;
-                }
-                else
+
+                dtos.Add(dto);
+            }
+
+            // 3. Return the clean DTOs to the Controller
+            return dtos;
+        }
+
+        public async Task<List<InventoryItemResponseDto>> GetDiscardedItemAsync(string userId)
+        {
+            // 1. Call the interface method to get raw database entities
+            List<Food> entities = await _dataService.GetDiscardedItemAsync(userId);
+
+            // 2. Map the Entities to DTOs
+            var dtos = new List<InventoryItemResponseDto>();
+
+            foreach (var entity in entities)
+            {
+                // Create the base DTO and map the direct fields
+                var dto = new InventoryItemResponseDto
                 {
+                    InventoryId = entity.InventoryId,
+                    IsCustomItem = entity.IsCustomItem,
+                    BarcodeRef = entity.BarcodeRef,
+                    Quantity = entity.Quantity,
+                    Notes = entity.Notes,
+                    DisplayPrice = entity.CustomPrice ?? 0, // Assuming custom price is the only price for now
+                    // Convert Firestore Timestamps to standard C# DateTimes
+                    ExpirationDate = entity.ExpirationDate.ToDateTime(),
+                    DateRegistered = entity.DateRegistered.ToDateTime()
+                };
 
-                    dto = await getBarcodedItemForRequest(dto);
+                   
+                    dto.DisplayName = entity.CustomName ?? "Unknown Custom Item";
+                    dto.DisplayCategory = entity.CustomCategory ?? "Uncategorized";
+                    dto.WeightGrams = entity.CustomWeightGrams;
+               
+       
+                dtos.Add(dto);
+            }
+
+            // 3. Return the clean DTOs to the Controller
+            return dtos;
+        }
+
+        public async Task<List<InventoryItemResponseDto>> GetConsumedItemAsync(string userId)
+        {
+            // 1. Call the interface method to get raw database entities
+            List<Food> entities = await _dataService.GetConsumedItemAsync(userId);
+
+            // 2. Map the Entities to DTOs
+            var dtos = new List<InventoryItemResponseDto>();
+
+            foreach (var entity in entities)
+            {
+                // Create the base DTO and map the direct fields
+                var dto = new InventoryItemResponseDto
+                {
+                    InventoryId = entity.InventoryId,
+                    IsCustomItem = entity.IsCustomItem,
+                    BarcodeRef = entity.BarcodeRef,
+                    Quantity = entity.Quantity,
+                    Notes = entity.Notes,
+                    DisplayPrice = entity.CustomPrice ?? 0, // Assuming custom price is the only price for now
+                    // Convert Firestore Timestamps to standard C# DateTimes
+                    ExpirationDate = entity.ExpirationDate.ToDateTime(),
+                    DateRegistered = entity.DateRegistered.ToDateTime()
+                };
 
 
-                }
+                dto.DisplayName = entity.CustomName ?? "Unknown Custom Item";
+                dto.DisplayCategory = entity.CustomCategory ?? "Uncategorized";
+                dto.WeightGrams = entity.CustomWeightGrams;
 
-                // Add the clean, translated DTO to our outgoing list
+
                 dtos.Add(dto);
             }
 

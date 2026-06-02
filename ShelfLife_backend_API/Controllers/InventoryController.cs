@@ -55,7 +55,47 @@ namespace ShellLife_backend_API.Controllers
          
             return Ok(pantryDtos);
         }
+        [HttpGet("discarded")]
+        public async Task<IActionResult> GetDiscardedItems()
+        {
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
 
+
+            List<InventoryItemResponseDto> pantryDtos = await _inventoryLogicService.GetDiscardedItemAsync(userId);
+
+
+            if (pantryDtos == null || pantryDtos.Count == 0)
+            {
+
+                return Ok(new List<InventoryItemResponseDto>());
+            }
+
+
+            return Ok(pantryDtos);
+        }
+
+        [HttpGet("consumed")]
+        public async Task<IActionResult> GetConsumedItems()
+        {
+            var userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+
+            List<InventoryItemResponseDto> pantryDtos = await _inventoryLogicService.GetConsumedItemAsync(userId);
+
+
+            if (pantryDtos == null || pantryDtos.Count == 0)
+            {
+
+                return Ok(new List<InventoryItemResponseDto>());
+            }
+
+
+            return Ok(pantryDtos);
+        }
 
         [HttpDelete("{inventoryId}")]
         public async Task<IActionResult> discardInventoryItem(string inventoryId)
