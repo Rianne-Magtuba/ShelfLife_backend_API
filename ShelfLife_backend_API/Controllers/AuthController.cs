@@ -1,5 +1,6 @@
 ﻿using Business_Layer.DTOs.UserDTO;
 using Business_Layer.Services;
+using FirebaseAdmin.Auth;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +23,29 @@ namespace ShelfLife_backend_API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDTO dto)
         {
-            var token = await _auth.RegisterAsync(dto);
-            return Ok(new { token });
+            try
+            {
+                var token = await _auth.RegisterAsync(dto);
+                return Ok(new { token });
+
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+
+            }
+            catch (FirebaseAuthException ex)
+            {
+     
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+              
+                return StatusCode(500, new { error = "An unexpected error occurred during registration." });
+            }
         }
+            
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDTO dto)
@@ -33,10 +54,26 @@ namespace ShelfLife_backend_API.Controllers
             {
                 var token = await _auth.LoginAsync(dto);
                 return Ok(new { token });
+            } 
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+
+            }
+            catch (FirebaseAuthException ex)
+            {
+     
+                return BadRequest(new { error = ex.Message });
+            }
+          
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return Unauthorized(new { message = ex.Message });
+
+                return StatusCode(500, new { error = "An unexpected error occurred during login." });
             }
         }
 

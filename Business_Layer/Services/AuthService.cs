@@ -36,11 +36,11 @@ namespace Business_Layer.Services
         {
             var existingEmail = await _repo.GetByEmailAsync(dto.Email);
             if (existingEmail != null)
-                return "Email already exists";
+                throw new ArgumentException("Email already exists");
 
             var existingUsername = await _repo.GetByUsernameAsync(dto.Username);
             if (existingUsername != null)
-                return "Username already taken";
+                throw new ArgumentException("Username already taken");
 
             var hash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
@@ -67,12 +67,11 @@ namespace Business_Layer.Services
         {
             var user = await _repo.GetByEmailAsync(dto.Email);
             if (user == null)
-                throw new Exception("Invalid credentials");
+                throw new UnauthorizedAccessException("Invalid credentials");
 
             var valid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
             if (!valid)
-                throw new Exception("Invalid credentials");
-
+                throw new UnauthorizedAccessException("Invalid credentials");
             return GenerateJwt(user);
         }
 
