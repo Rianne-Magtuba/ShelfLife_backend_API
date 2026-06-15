@@ -116,8 +116,9 @@ namespace ShelfLife_backend_API.Controllers
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordDTO dto)
         {
-            var email = User.FindFirst(ClaimTypes.Email)?.Value;
-
+            // In AuthController, change-password endpoint:
+            var email = User.FindFirst(ClaimTypes.Email)?.Value
+         ?? User.FindFirst("email")?.Value;
             if (email == null)
                 return Unauthorized();
 
