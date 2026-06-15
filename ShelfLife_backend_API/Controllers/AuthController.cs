@@ -91,7 +91,26 @@ namespace ShelfLife_backend_API.Controllers
             return Ok(user);
         }
 
+        [Authorize(Policy = "CustomAuth")]
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile(
+    UpdateProfileDTO dto)
+        {
+            var email =
+                User.FindFirst(ClaimTypes.Email)?.Value;
 
+            if (email == null)
+                return Unauthorized();
+
+            await _auth.UpdateProfileAsync(
+                email,
+                dto);
+
+            return Ok(new
+            {
+                message = "Profile updated successfully"
+            });
+        }
 
         [HttpGet("firebase-profile")]
         public async Task<IActionResult> FirebaseProfile([FromServices] FirebaseAuthService firebaseAuth)

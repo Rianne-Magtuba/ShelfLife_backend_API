@@ -137,5 +137,46 @@ namespace Business_Layer.Services
                 email,
                 resetLink);
         }
+
+
+        public async Task UpdateProfileAsync(
+        string currentEmail,
+        UpdateProfileDTO dto)
+        {
+            var user = await _repo.GetByEmailAsync(currentEmail);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            var existingEmail =
+                await _repo.GetByEmailAsync(dto.Email);
+
+            if (existingEmail != null &&
+                existingEmail.Id != user.Id)
+            {
+                throw new Exception(
+                    "Email already exists");
+            }
+
+            var existingUsername =
+                await _repo.GetByUsernameAsync(dto.Username);
+
+            if (existingUsername != null &&
+                existingUsername.Id != user.Id)
+            {
+                throw new Exception(
+                    "Username already exists");
+            }
+
+            user.Username = dto.Username;
+            user.Email = dto.Email;
+
+            await _repo.UpdateAsync(user);
+        }
+
+        public Task ChangePasswordAsync(string email, ChangePasswordDTO dto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -60,5 +60,11 @@ namespace Data_Layer.Services
 
             return doc.ConvertTo<User>();
         }
+        public async Task UpdateAsync(User user)
+        {
+            await _users
+                .Document(user.Id)
+                .SetAsync(user);
+        }
     }
 }
