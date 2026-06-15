@@ -112,6 +112,30 @@ namespace ShelfLife_backend_API.Controllers
             });
         }
 
+        [Authorize(Policy = "CustomAuth")]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDTO dto)
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (email == null)
+                return Unauthorized();
+
+            try
+            {
+                await _auth.ChangePasswordAsync(email, dto);
+                return Ok(new { message = "Password changed successfully" });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("firebase-profile")]
         public async Task<IActionResult> FirebaseProfile([FromServices] FirebaseAuthService firebaseAuth)
         {

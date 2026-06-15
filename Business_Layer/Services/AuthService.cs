@@ -174,9 +174,20 @@ namespace Business_Layer.Services
             await _repo.UpdateAsync(user);
         }
 
-        public Task ChangePasswordAsync(string email, ChangePasswordDTO dto)
+        public async Task ChangePasswordAsync(string email, ChangePasswordDTO dto)
         {
-            throw new NotImplementedException();
+            var user = await _repo.GetByEmailAsync(email);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            var valid = BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash);
+            if (!valid)
+                throw new UnauthorizedAccessException("Current password is incorrect");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            await _repo.UpdateAsync(user);
         }
     }
 }
