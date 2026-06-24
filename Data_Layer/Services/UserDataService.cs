@@ -22,6 +22,7 @@ namespace Data_Layer.Services
 
         public async Task<User> CreateAsync(User user)
         {
+            
             var doc = await _users.AddAsync(user);
             user.Id = doc.Id;
             return user;
