@@ -28,63 +28,70 @@ namespace ShellLife_backend_API
             builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
             // Add services to the container.
 
-            const string jwtKeySecretPath = "/secrets-jwt/jwt-key";
-            if (File.Exists(jwtKeySecretPath))
+            // ... [Web builder initialization] ...
+
+            try
             {
-                var jwtKey = File.ReadAllText(jwtKeySecretPath).Trim();
-                builder.Configuration["Jwt:Key"] = jwtKey;
-            }
-
-            var logger = LoggerFactory.Create(config =>
-            {
-                config.AddConsole();
-            }).CreateLogger("Startup");
-
-            logger.LogInformation("VALIDATION JWT KEY: " + builder.Configuration["Jwt:Key"]);
-
-            Console.WriteLine($"ASPNETCORE_ENVIRONMENT = {builder.Environment.EnvironmentName}");
-
-
-            const string emailPasswordSecretPath = "/secrets-email/app-password";
-            if (File.Exists(emailPasswordSecretPath))
-            {
-                var emailPassword = File.ReadAllText(emailPasswordSecretPath).Trim();
-                builder.Configuration["EmailSettings:AppPassword"] = emailPassword;
-            }
-            var firestoreOptions = builder.Configuration
-            .GetSection(FirestoreOptions.SectionName)
-            .Get<FirestoreOptions>();
-
-            const string cloudRunSecretPath = "/secrets/firebase-sa";
-
-            string firebasePath = null;
-
-            // Cloud Run
-            if (File.Exists(cloudRunSecretPath))
-            {
-                firebasePath = cloudRunSecretPath;
-            }
-            // Local fallback (same as Firestore DI)
-            else if (!string.IsNullOrEmpty(firestoreOptions?.CredentialsPath)
-                     && File.Exists(firestoreOptions.CredentialsPath))
-            {
-                firebasePath = firestoreOptions.CredentialsPath;
-            }
-
-            // Final safety check
-            if (firebasePath == null)
-            {
-                throw new Exception("Firebase credentials not found (Cloud Run or local)");
-            }
-
-            // Initialize FirebaseApp only once
-            if (FirebaseApp.DefaultInstance == null)
-            {
-                FirebaseApp.Create(new AppOptions
+                // 1. Check JWT Secret
+                const string jwtKeySecretPath = "/secrets-jwt/jwt-key";
+                if (File.Exists(jwtKeySecretPath))
                 {
-                    Credential = GoogleCredential.FromFile(firebasePath)
-                });
+                    var jwtKey = File.ReadAllText(jwtKeySecretPath).Trim();
+                    builder.Configuration["Jwt:Key"] = jwtKey;
+                }
+                else
+                {
+                    Console.WriteLine("WARNING: JWT secret file not found at " + jwtKeySecretPath);
+                }
+
+                // 2. Check Email Secret
+                const string emailPasswordSecretPath = "/secrets-email/app-password";
+                if (File.Exists(emailPasswordSecretPath))
+                {
+                    var emailPassword = File.ReadAllText(emailPasswordSecretPath).Trim();
+                    builder.Configuration["EmailSettings:AppPassword"] = emailPassword;
+                }
+
+                // 3. Check Firebase Secret
+                var firestoreOptions = builder.Configuration.GetSection(FirestoreOptions.SectionName).Get<FirestoreOptions>();
+                const string cloudRunSecretPath = "/secrets/firebase-sa";
+                string firebasePath = null;
+
+                if (File.Exists(cloudRunSecretPath))
+                {
+                    firebasePath = cloudRunSecretPath;
+                }
+                else if (!string.IsNullOrEmpty(firestoreOptions?.CredentialsPath) && File.Exists(firestoreOptions.CredentialsPath))
+                {
+                    firebasePath = firestoreOptions.CredentialsPath;
+                }
+
+                if (firebasePath == null)
+                {
+                    throw new Exception("CRITICAL: Firebase credentials not found (Cloud Run or local)");
+                }
+
+                if (FirebaseApp.DefaultInstance == null)
+                {
+                    FirebaseApp.Create(new AppOptions
+                    {
+                        Credential = GoogleCredential.FromFile(firebasePath)
+                    });
+                }
             }
+            catch (Exception ex)
+            {
+                // THIS is the magic part. We force it to print to standard output before dying.
+                Console.WriteLine("================ STARTUP CRASH ================");
+                Console.WriteLine($"ERROR MESSAGE: {ex.Message}");
+                Console.WriteLine($"STACK TRACE: {ex.StackTrace}");
+                Console.WriteLine("===============================================");
+
+                // Allow the app to exit cleanly with an error code rather than an abrupt Signal 6
+                Environment.Exit(1);
+            }
+
+            // ... [Rest of your service registrations] ...
 
 
             builder.Services.AddControllers();
