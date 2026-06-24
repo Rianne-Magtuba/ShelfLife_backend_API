@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Common_Class.Entities;
+﻿using Business_Layer.DTOs.ProductDTO;
 using Business_Layer.Services;
-using Business_Layer.DTOs.ProductDTO;
+using Common_Class.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 namespace ShellLife_backend_API.Controllers
 {
     [ApiController]
@@ -15,7 +16,7 @@ namespace ShellLife_backend_API.Controllers
             _productLogicService = productLogicService;
         }
 
-
+        [Authorize(Policy = "CustomAuth")]
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
