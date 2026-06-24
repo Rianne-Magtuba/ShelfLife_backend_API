@@ -27,6 +27,18 @@ namespace ShellLife_backend_API.Controllers
             }
             return Ok(prodList);
         }
+        [HttpGet("category/{category}")]
+        public async Task<IActionResult> GetProductsByCategory(string category)
+        {
+            List<ProductRequestDTO> prodList = await _productLogicService.getProductsByCategoryAsync(category);
+            if (prodList == null || prodList.Count == 0)
+            {
+                return Ok(new List<ProductRequestDTO>());
+            }
+            return Ok(prodList);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> registerProduct([FromBody] ProductRequestDTO requestDto) {
 
@@ -55,7 +67,7 @@ namespace ShellLife_backend_API.Controllers
 
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{barcode}")]
         public async Task<IActionResult> UpdateProduct(string barcode,[FromBody] ProductRequestDTO requestDto)
         {

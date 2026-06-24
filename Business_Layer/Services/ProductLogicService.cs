@@ -77,6 +77,24 @@ namespace Business_Layer.Services
             return productDTOs;
         }
 
+        public async Task<List<ProductRequestDTO>> getProductsByCategoryAsync(string category)
+        {
+            var productEntities = await _dataService.getProductsByCategoryAsync(category);
+            var productDTOs = new List<ProductRequestDTO>();
+            foreach (var product in productEntities)
+            {
+                var dto = new ProductRequestDTO
+                {
+                    Barcode = product.Barcode,
+                    Name = product.Name,
+                    Category = product.Category,
+                    WeightGrams = product.WeightGrams,
+                    Price = product.Price,
+                };
+                productDTOs.Add(dto);
+            }
+            return productDTOs;
+        }   
         public async Task<bool> UpdateProductAsync(ProductRequestDTO requestDto)
         {
             if (requestDto == null)
