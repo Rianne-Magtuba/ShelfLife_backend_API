@@ -22,12 +22,7 @@ namespace ShellLife_backend_API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            var logger = LoggerFactory.Create(config =>
-            {
-                config.AddConsole();
-            }).CreateLogger("Startup");
-
-            logger.LogInformation("VALIDATION JWT KEY: " + builder.Configuration["Jwt:Key"]);
+           
 
             var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
             builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
@@ -40,6 +35,12 @@ namespace ShellLife_backend_API
                 builder.Configuration["Jwt:Key"] = jwtKey;
             }
 
+            var logger = LoggerFactory.Create(config =>
+            {
+                config.AddConsole();
+            }).CreateLogger("Startup");
+
+            logger.LogInformation("VALIDATION JWT KEY: " + builder.Configuration["Jwt:Key"]);
 
             Console.WriteLine($"ASPNETCORE_ENVIRONMENT = {builder.Environment.EnvironmentName}");
 
