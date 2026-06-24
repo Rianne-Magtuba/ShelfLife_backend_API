@@ -18,6 +18,7 @@ namespace Business_Layer.Services
         Task ChangePasswordAsync(string email,ChangePasswordDTO dto);
         Task<NotificationSettingsResponseDto> GetNotificationSettingsAsync(string userId);
 
+        Task<int> getNumberOfUsersAsync();
         Task<bool> UpdateNotificationSettingsAsync(string userId,UpdateNotificationSettingsRequestDto request);
     }
 }

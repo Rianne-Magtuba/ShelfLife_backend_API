@@ -13,6 +13,7 @@ namespace Common_Class.Interfaces
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByUsernameAsync(string username);
         Task<User?> GetByIdAsync(string id);
+        Task<int> getNumberOfUsersAsync();
         Task UpdateAsync(User user);
     }
 }
