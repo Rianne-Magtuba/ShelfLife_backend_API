@@ -262,6 +262,12 @@ namespace ShelfLife_backend_API.Controllers
                 claims = User.Claims.ToList()
             });
         }
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin-panel")]
+        public IActionResult AdminPanel()
+        {
+            return Ok("Welcome Admin");
+        }
     }
 }
 

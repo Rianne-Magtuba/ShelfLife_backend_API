@@ -62,6 +62,7 @@ namespace Business_Layer.Services
                 Username = dto.Username,
                 Email = dto.Email,
                 PasswordHash = hash
+                Role = "User"
             });
 
             return "Registration Successful";
@@ -71,15 +72,14 @@ namespace Business_Layer.Services
         {
             
             var user = await _repo.GetByEmailAsync(dto.Email);
+            _logger.LogInformation("USER ROLE FROM DB: {Role}", user.Role);
+
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid credentials");
 
             var valid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
             if (!valid)
                 throw new UnauthorizedAccessException("Invalid credentials");
-            //var token = GenerateJwt(user);
-            //Console.WriteLine(token);
-            //return token;
             var token = GenerateJwt(user);
             _logger.LogInformation("LOGIN TOKEN: {Token}", token);
             return token;
@@ -99,7 +99,8 @@ namespace Business_Layer.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("username", user.Username)
+                new Claim("username", user.Username),
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var token = new JwtSecurityToken(

@@ -10,6 +10,7 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 using System.Text;
 
 
@@ -20,8 +21,6 @@ namespace ShellLife_backend_API
     {
         public static void Main(string[] args)
         {
-            File.WriteAllText("C:\\temp\\running-test.txt", "API IS RUNNING: " + DateTime.Now);
-            throw new Exception("THIS IS THE RUNNING PROJECT");
             var builder = WebApplication.CreateBuilder(args);
             var logger = LoggerFactory.Create(config =>
             {
@@ -168,7 +167,8 @@ namespace ShellLife_backend_API
                     ),
 
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    RoleClaimType = ClaimTypes.Role
                 };
             });
 

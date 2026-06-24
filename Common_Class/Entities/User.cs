@@ -20,6 +20,9 @@ namespace Common_Class.Entities
         public string Email { get; set; }
 
         [FirestoreProperty]
+        public string Role { get; set; } = "User";
+
+        [FirestoreProperty]
         public string PasswordHash { get; set; }
 
         [FirestoreProperty]
