@@ -13,14 +13,11 @@ namespace Business_Layer.Services
         Task<string> LoginAsync(LoginDTO dto);
         Task<UserProfileDTO> GetProfileByEmailAsync(string email);
         Task SendPasswordResetAsync(string email);
-        Task UpdateProfileAsync(
-    string currentEmail,
-    UpdateProfileDTO dto
-);
+        Task UpdateProfileAsync(string currentEmail,UpdateProfileDTO dto);
 
-        Task ChangePasswordAsync(
-            string email,
-            ChangePasswordDTO dto
-        );
+        Task ChangePasswordAsync(string email,ChangePasswordDTO dto);
+        Task<NotificationSettingsResponseDto> GetNotificationSettingsAsync(string userId);
+
+        Task<bool> UpdateNotificationSettingsAsync(string userId,UpdateNotificationSettingsRequestDto request);
     }
 }

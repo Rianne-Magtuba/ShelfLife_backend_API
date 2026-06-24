@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static Google.Rpc.Context.AttributeContext.Types;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ShelfLife_backend_API.Controllers
 {
@@ -181,6 +182,85 @@ namespace ShelfLife_backend_API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [Authorize(Policy = "CustomAuth")]
+        [HttpGet("notification-settings")]
+        public async Task<IActionResult> GetNotificationSettings()
+        {
+            Console.WriteLine("GET notification-settings reached");
+            var userId =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var settings =
+                await _auth.GetNotificationSettingsAsync(userId);
+
+            return Ok(settings);
+        }
+
+        [Authorize(Policy = "CustomAuth")]
+        [HttpPut("notification-settings")]
+        public async Task<IActionResult> UpdateNotificationSettings(
+    UpdateNotificationSettingsRequestDto dto)
+        {
+            var userId =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var success =
+                await _auth.UpdateNotificationSettingsAsync(
+                    userId,
+                    dto);
+
+            if (!success)
+                return BadRequest(new
+                {
+                    message = "Failed to update notification settings"
+                });
+
+            return Ok(new
+            {
+                message = "Notification settings updated successfully"
+            });
+        }
+        [HttpGet("auth-test")]
+        [Authorize]
+        public IActionResult Test()
+        {
+            return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
+        }
+
+        [HttpGet("token-debug")]
+        public IActionResult TokenDebug()
+        {
+            var header = Request.Headers["Authorization"].ToString();
+
+            return Ok(new
+            {
+                authHeader = header,
+                userAuthenticated = User.Identity?.IsAuthenticated,
+                claims = User.Claims.Select(c => new { c.Type, c.Value })
+            });
+        }
+
+        [HttpGet("debug-me")]
+        public IActionResult DebugMe()
+        {
+            var auth = Request.Headers["Authorization"].ToString();
+
+            return Ok(new
+            {
+                header = auth,
+                identity = User.Identity?.IsAuthenticated,
+                claims = User.Claims.ToList()
+            });
         }
     }
 }

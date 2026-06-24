@@ -20,7 +20,16 @@ namespace ShellLife_backend_API
     {
         public static void Main(string[] args)
         {
+            File.WriteAllText("C:\\temp\\running-test.txt", "API IS RUNNING: " + DateTime.Now);
+            throw new Exception("THIS IS THE RUNNING PROJECT");
             var builder = WebApplication.CreateBuilder(args);
+            var logger = LoggerFactory.Create(config =>
+            {
+                config.AddConsole();
+            }).CreateLogger("Startup");
+
+            logger.LogInformation("VALIDATION JWT KEY: " + builder.Configuration["Jwt:Key"]);
+
             var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
             builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
             // Add services to the container.
@@ -31,6 +40,10 @@ namespace ShellLife_backend_API
                 var jwtKey = File.ReadAllText(jwtKeySecretPath).Trim();
                 builder.Configuration["Jwt:Key"] = jwtKey;
             }
+
+
+            Console.WriteLine($"ASPNETCORE_ENVIRONMENT = {builder.Environment.EnvironmentName}");
+
 
             const string emailPasswordSecretPath = "/secrets-email/app-password";
             if (File.Exists(emailPasswordSecretPath))
@@ -87,8 +100,11 @@ namespace ShellLife_backend_API
             builder.Services.AddScoped<FirebaseAuthService>();
             builder.Services.AddScoped<EmailService>();
 
+            
             builder.Services.Configure<JwtSettings>(
                 builder.Configuration.GetSection("Jwt"));
+
+            var jwtTest = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 
             builder.Services.Configure<EmailSettings>(
                 builder.Configuration.GetSection("EmailSettings"));
@@ -124,31 +140,35 @@ namespace ShellLife_backend_API
                 });
             });
 
+            
             builder.Services.AddAuthentication(options =>
             {
+                options.DefaultScheme = "CustomJwt";
                 options.DefaultAuthenticateScheme = "CustomJwt";
                 options.DefaultChallengeScheme = "CustomJwt";
             })
             .AddJwtBearer("CustomJwt", options =>
             {
-                var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+                var key = builder.Configuration["Jwt:Key"];
+                var issuer = builder.Configuration["Jwt:Issuer"];
 
-                if (jwt == null || string.IsNullOrEmpty(jwt.Key))
-                    throw new Exception("JWT settings are missing or invalid");
+                if (string.IsNullOrWhiteSpace(key))
+                    throw new Exception("JWT Key missing at runtime");
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = jwt.Issuer,
+                    ValidIssuer = issuer,
 
                     ValidateAudience = false,
 
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwt.Key)
+                        Encoding.UTF8.GetBytes(key)
                     ),
 
-                    ValidateLifetime = true
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
@@ -161,8 +181,9 @@ namespace ShellLife_backend_API
 
             var app = builder.Build();
 
-      
-     
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -174,8 +195,7 @@ namespace ShellLife_backend_API
                 app.UseHttpsRedirection();
             }
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+            
             app.MapControllers();
             app.Run();
         }

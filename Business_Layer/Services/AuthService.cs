@@ -7,6 +7,7 @@ using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,16 +21,19 @@ namespace Business_Layer.Services
 {
     public class AuthService : IAuthService
     {
+        private readonly ILogger<AuthService> _logger;
         private readonly IUserDataService _repo;
         private readonly JwtSettings _jwt;
         private readonly EmailService _emailService;
 
 
-        public AuthService(IUserDataService repo, IOptions<JwtSettings> jwtOptions, EmailService emailService)
+        public AuthService(IUserDataService repo, IOptions<JwtSettings> jwtOptions, EmailService emailService, ILogger<AuthService> logger)
         {
+
             _jwt = jwtOptions.Value;
             _repo = repo;
             _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<string> RegisterAsync(RegisterDTO dto)
@@ -65,6 +69,7 @@ namespace Business_Layer.Services
 
         public async Task<string> LoginAsync(LoginDTO dto)
         {
+            
             var user = await _repo.GetByEmailAsync(dto.Email);
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid credentials");
@@ -72,11 +77,18 @@ namespace Business_Layer.Services
             var valid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
             if (!valid)
                 throw new UnauthorizedAccessException("Invalid credentials");
-            return GenerateJwt(user);
+            //var token = GenerateJwt(user);
+            //Console.WriteLine(token);
+            //return token;
+            var token = GenerateJwt(user);
+            _logger.LogInformation("LOGIN TOKEN: {Token}", token);
+            return token;
+
         }
 
         private string GenerateJwt(User user)
         {
+            Console.WriteLine($"[LOGIN JWT KEY] {_jwt.Key}");
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_jwt.Key)
             );
@@ -85,13 +97,14 @@ namespace Business_Layer.Services
 
             var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("username", user.Username),
-                 new Claim(JwtRegisteredClaimNames.Sub, user.Id)
+                new Claim("username", user.Username)
             };
 
             var token = new JwtSecurityToken(
                 issuer: _jwt.Issuer,
+                audience: null,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(_jwt.ExpiryMinutes),
                 signingCredentials: creds
@@ -188,6 +201,45 @@ namespace Business_Layer.Services
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
 
             await _repo.UpdateAsync(user);
+        }
+
+        public async Task<NotificationSettingsResponseDto>
+    GetNotificationSettingsAsync(string userId)
+        {
+            var user = await _repo.GetByIdAsync(userId);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            return new NotificationSettingsResponseDto
+            {
+                Enabled = user.NotificationEnabled,
+                Frequency = user.NotificationFrequency,
+                AlertLeadDays = user.NotificationLeadDays,
+                ReminderHour = user.NotificationReminderHour,
+                ReminderMinute = user.NotificationReminderMinute
+            };
+        }
+
+        public async Task<bool>
+            UpdateNotificationSettingsAsync(
+                string userId,
+                UpdateNotificationSettingsRequestDto request)
+        {
+            var user = await _repo.GetByIdAsync(userId);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            user.NotificationEnabled = request.Enabled;
+            user.NotificationFrequency = request.Frequency;
+            user.NotificationLeadDays = request.AlertLeadDays;
+            user.NotificationReminderHour = request.ReminderHour;
+            user.NotificationReminderMinute = request.ReminderMinute;
+
+            await _repo.UpdateAsync(user);
+
+            return true;
         }
     }
 }
