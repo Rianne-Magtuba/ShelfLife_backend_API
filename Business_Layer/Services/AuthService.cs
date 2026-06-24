@@ -61,7 +61,7 @@ namespace Business_Layer.Services
             {
                 Username = dto.Username,
                 Email = dto.Email,
-                PasswordHash = hash
+                PasswordHash = hash,
                 Role = "User"
             });
 
