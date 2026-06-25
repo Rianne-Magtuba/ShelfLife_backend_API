@@ -37,16 +37,16 @@ namespace ShelfLife_backend_API.Controllers
             }
             catch (FirebaseAuthException ex)
             {
-     
+
                 return BadRequest(new { error = ex.Message });
             }
             catch (Exception ex)
             {
-              
+
                 return StatusCode(500, new { error = "An unexpected error occurred during registration." });
             }
         }
-            
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDTO dto)
@@ -55,7 +55,7 @@ namespace ShelfLife_backend_API.Controllers
             {
                 var token = await _auth.LoginAsync(dto);
                 return Ok(new { token });
-            } 
+            }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
@@ -63,10 +63,10 @@ namespace ShelfLife_backend_API.Controllers
             }
             catch (FirebaseAuthException ex)
             {
-     
+
                 return BadRequest(new { error = ex.Message });
             }
-          
+
             catch (UnauthorizedAccessException ex)
             {
                 return Unauthorized(new { message = ex.Message });
@@ -268,6 +268,21 @@ namespace ShelfLife_backend_API.Controllers
         {
             return Ok("Welcome Admin");
         }
+
+        [HttpGet("user/count")]
+        public async Task<IActionResult> getNumberOfUsers()
+        {
+            try
+            {
+                int userCount = await _auth.getNumberOfUsersAsync();
+                return Ok(new { userCount });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred while retrieving the number of users." });
+            }
+        }
+
     }
 }
 

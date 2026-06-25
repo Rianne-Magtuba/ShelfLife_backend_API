@@ -67,7 +67,10 @@ namespace Business_Layer.Services
 
             return "Registration Successful";
         }
-
+        public async Task<int> getNumberOfUsersAsync()
+        {
+            return await _repo.getNumberOfUsersAsync();
+        }
         public async Task<string> LoginAsync(LoginDTO dto)
         {
             

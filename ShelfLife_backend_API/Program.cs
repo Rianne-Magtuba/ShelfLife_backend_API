@@ -115,8 +115,9 @@ namespace ShellLife_backend_API
             builder.Services.AddScoped<IUserDataService, UserDataService>();
             builder.Services.AddScoped<FirebaseAuthService>();
             builder.Services.AddScoped<EmailService>();
+            builder.Services.AddScoped<IProductUpdateDataService, ProductUpdateDataService>();
+            builder.Services.AddScoped<ProductUpdateLogicService>();
 
-            
             builder.Services.Configure<JwtSettings>(
                 builder.Configuration.GetSection("Jwt"));
 

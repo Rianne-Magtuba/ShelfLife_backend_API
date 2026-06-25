@@ -67,5 +67,12 @@ namespace Data_Layer.Services
                 .Document(user.Id)
                 .SetAsync(user);
         }
+
+        public async Task<int> getNumberOfUsersAsync()
+        {
+           await _users.GetSnapshotAsync();
+            var snapshot = await _users.GetSnapshotAsync();
+            return snapshot.Count;
+        }
     }
 }
