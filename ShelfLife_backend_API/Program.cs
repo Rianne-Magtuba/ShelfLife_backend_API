@@ -22,7 +22,16 @@ namespace ShellLife_backend_API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-           
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowLocalReact", policy =>
+                {
+                    // This tells your Cloud Run API to accept requests from your local machine
+                    policy.WithOrigins("http://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
             var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
             builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
@@ -188,6 +197,7 @@ namespace ShellLife_backend_API
             });
 
             var app = builder.Build();
+            app.UseCors("AllowLocalReact");
 
             app.UseAuthentication();
             app.UseAuthorization();
