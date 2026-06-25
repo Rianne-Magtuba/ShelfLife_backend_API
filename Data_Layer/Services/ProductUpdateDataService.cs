@@ -50,5 +50,28 @@ namespace Data_Layer.Services
             }
             return list;
         }
+
+        public async Task<bool> UpdateProductStatus(ProductUpdateRequest request)
+        {
+            var documentRef = _firestoreDb.Collection("ProductUpdateRequests").Document(request.RequestId);
+            var snapshot = await documentRef.GetSnapshotAsync();
+
+            if (!snapshot.Exists)
+            {
+                return false;
+            }
+
+            await documentRef.SetAsync(request, SetOptions.Overwrite);
+
+            return true;
+        }
+
+        public async Task<ProductUpdateRequest?> GetRequestByIdAsync(string requestId)
+        {
+            var doc = await _firestoreDb.Collection("ProductUpdateRequests").Document(requestId).GetSnapshotAsync();
+            if (!doc.Exists) return null;
+
+            return doc.ConvertTo<ProductUpdateRequest>();
+        }
     }
 }

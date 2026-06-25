@@ -50,5 +50,41 @@ namespace Business_Layer.Services
         {
             return await _updateDataService.GetPendingRequestsAsync();
         }
+
+        public async Task<bool> ProcessUpdateRequestAsync(string requestId, string newStatus)
+        {
+            // 1. Fetch the pending request
+            var updateRequest = await _updateDataService.GetRequestByIdAsync(requestId);
+
+            if (updateRequest == null || updateRequest.Status != "Pending")
+            {
+                return false; // Request doesn't exist or was already processed
+            }
+
+            // 2. If Approved, apply the changes to the actual Product Catalog
+            if (newStatus == "Approved")
+            {
+                var actualProduct = await _productDataService.GetProductAsync(updateRequest.Barcode);
+
+                if (actualProduct != null)
+                {
+                    actualProduct.Name = updateRequest.ProposedName;
+                    actualProduct.Category = updateRequest.ProposedCategory;
+                    actualProduct.WeightGrams = updateRequest.ProposedWeightGrams;
+                    actualProduct.Price = updateRequest.ProposedPrice;
+
+                    // Save changes to the main Product Catalog
+                    var productUpdated = await _productDataService.UpdateProductAsync(actualProduct);
+
+                    if (!productUpdated) return false; // Failsafe
+                }
+            }
+
+            // 3. Update the status on the request ticket itself
+            updateRequest.Status = newStatus;
+
+            // Call the method you just wrote!
+            return await _updateDataService.UpdateProductStatus(updateRequest);
+        }
     }
 }

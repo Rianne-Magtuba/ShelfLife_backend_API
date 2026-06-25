@@ -52,5 +52,29 @@ namespace ShellLife_backend_API.Controllers
             var requests = await _updateLogicService.GetPendingUpdatesAsync();
             return Ok(requests);
         }
+
+
+        [HttpPut("{requestId}/review")]
+        public async Task<IActionResult> ReviewProductUpdate(string requestId, [FromBody] ReviewUpdateRequestDTO dto)
+        {
+            // 1. Verify the user is an Admin
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (role != "Admin")
+            {
+                return StatusCode(403, new { Message = "Forbidden: Only admins can review product updates." });
+            }
+
+            
+
+            // 3. Process the request
+            var success = await _updateLogicService.ProcessUpdateRequestAsync(requestId, dto.NewStatus);
+
+            if (success)
+            {
+                return Ok(new { Message = $"Product update request successfully marked as {dto.NewStatus}." });
+            }
+
+            return BadRequest("Failed to process request. It may not exist or has already been reviewed.");
+        }
     }
-}
+    }

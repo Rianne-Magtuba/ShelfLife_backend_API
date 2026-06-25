@@ -11,10 +11,12 @@ namespace Business_Layer.Services
     public class ProductLogicService
     {
         private readonly IProductDataService _dataService;
+  
 
         public ProductLogicService(IProductDataService dataService)
         {
             _dataService = dataService;
+            
         }
 
 

@@ -11,5 +11,8 @@ namespace Common_Class.Interfaces
     {
         Task<bool> CreateRequestAsync(ProductUpdateRequest request);
         Task<List<ProductUpdateRequest>> GetPendingRequestsAsync();
+
+        Task<bool> UpdateProductStatus(ProductUpdateRequest request);
+        Task<ProductUpdateRequest?> GetRequestByIdAsync(string requestId);
     }
 }
